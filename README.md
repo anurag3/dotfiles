@@ -6,6 +6,8 @@ The dotfile updates Mac OSX settings and installs few development tools
 - Oh-My-ZSH
 - Pyenv
 
+The color scheme for iTerm - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Afterglow.itermcolors
+
 Notes -
 
 - Need to update script to install Spaceship theme for iTerm

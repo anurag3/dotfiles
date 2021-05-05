@@ -99,31 +99,24 @@ echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     # Set the icon size of Dock items to 36 pixels
-    defaults write com.apple.dock tilesize -int 36
-
+    defaults write com.apple.dock tilesize -int 36;
     # Change minimize/maximize window effect
-    defaults write com.apple.dock mineffect -string "scale"
-
+    defaults write com.apple.dock mineffect -string "scale";
     # Minimize windows into their application’s icon
-    defaults write com.apple.dock minimize-to-application -bool true
-
+    defaults write com.apple.dock minimize-to-application -bool true;
     # Show indicator lights for open applications in the Dock
-    defaults write com.apple.dock show-process-indicators -bool true
-
+    defaults write com.apple.dock show-process-indicators -bool true;
+    echo "updating dock hiding settings"
     # Remove the auto-hiding Dock delay
-    defaults write com.apple.dock autohide-delay -float 0
+    defaults write com.apple.dock autohide-delay -float 0; killall Dock;
     # Remove the animation when hiding/showing the Dock
-    defaults write com.apple.dock autohide-time-modifier -float 0
-
+    defaults write com.apple.dock autohide-time-modifier -float 0; killall Dock;
     # Automatically hide and show the Dock
-    defaults write com.apple.dock autohide -bool true
-
+    defaults write com.apple.dock autohide -bool true;
     # Make Dock icons of hidden applications translucent
-    defaults write com.apple.dock showhidden -bool true
-
+    defaults write com.apple.dock showhidden -bool true;
     # Don’t show recent applications in Dock
-    defaults write com.apple.dock show-recents -bool false
-
+    defaults write com.apple.dock show-recents -bool false;
     # Kill and restart Dock
     killall Dock
 fi
@@ -187,8 +180,15 @@ cd ~/code;
 git clone https://github.com/denysdovhan/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1;
 ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
 
+echo "Installing Xcode and Python dependencies"
+sudo xcode-select --install
+brew install openssl readline sqlite3 xz zlib
+
 echo "Installing Pyenv"
 brew update
 brew install pyenv
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+
+echo "Installing Keeping You Awake"
+brew install --cask keepingyouawake
