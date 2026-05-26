@@ -1,0 +1,101 @@
+{
+  "env": {
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(ls *)",
+      "Bash(cd *)",
+      "Bash(pwd *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(read *)",
+      "Bash(wc *)",
+      "Bash(tree *)",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(sbt *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk grep *)",
+      "Bash(rtk find *)",
+      "Bash(rtk git *)",
+      "Bash(rtk gh *)",
+      "Bash(rtk read *)",
+      "Bash(rtk wc *)",
+      "Bash(rtk tree *)",
+      "Bash(sbt test *)",
+      "Bash(mkdir -p /Users/anurag.desai/.claude/plans/**)",
+      "Bash(mkdir -p ~/.claude/plans/**)",
+      "Bash(rtk mkdir -p /Users/anurag.desai/.claude/plans/**)",
+      "Bash(rtk mkdir -p ~/.claude/plans/**)",
+      "Write(/Users/anurag.desai/.claude/plans/**)",
+      "Write(~/.claude/plans/**)",
+      "Edit(/Users/anurag.desai/.claude/plans/**)",
+      "Edit(~/.claude/plans/**)"
+    ],
+    "additionalDirectories": [
+      "~/.claude/plans/"
+    ]
+  },
+  "model": "opusplan",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"Caveman mode is ACTIVE. Respond terse like smart caveman. Drop articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries (sure/certainly/of course/happy to), hedging. Fragments OK. Short synonyms. Technical terms exact. Code blocks unchanged. Full caveman level.\"}}'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/anurag.desai/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bunx -y ccstatusline@latest",
+    "padding": 0,
+    "refreshInterval": 1
+  },
+  "enabledPlugins": {
+    "claude-md-management@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": false,
+    "sync-workspace-repos@local": true,
+    "commit-commands@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": false,
+    "superpowers@claude-plugins-official": true,
+    "obsidian@obsidian-skills": true
+  },
+  "extraKnownMarketplaces": {
+    "local": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/anurag.desai/.claude/local-skills"
+      }
+    },
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kepano/obsidian-skills"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen"
+}
