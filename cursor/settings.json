@@ -1,0 +1,88 @@
+{
+    "telemetry.telemetryLevel": "off",
+    "editor.scrollBeyondLastLine": false,
+    "editor.smoothScrolling": true,
+    "editor.fontFamily": "Monaco, Menlo, 'Courier New', monospace",
+    "editor.fontSize": 14,
+    "files.watcherExclude": {
+        "**/.bloop": true,
+        "**/.metals": true,
+        "**/.ammonite": true
+    },
+    "github.copilot.selectedCompletionModel": "",
+    "github.copilot.chat.codesearch.enabled": true,
+    "java.imports.gradle.wrapper.checksums": [
+        {
+            "sha256": "0613d7f6f3310f1b58305a0a9b0fee9b9e66ef5c433add56b426430efd9ffbc8",
+            "allowed": true
+        },
+        {
+            "sha256": "ac10c7d91f82da936f5cb4df79572926cb73aebe5d9ff7c7cef33ec6036d9818",
+            "allowed": true
+        }
+    ],
+    "diffEditor.useInlineViewWhenSpaceIsLimited": false,
+    "remote.defaultExtensionsIfInstalledLocally": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "GitHub.vscode-pull-request-github"
+    ],
+    "[sql]": {
+        "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.tabSize": 4,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.formatOnSave": true
+    },
+    "debugpy.showPythonInlineValues": true,
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "telemetry.feedback.enabled": false,
+    "chat.agent.enabled": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "[scala]": {
+        "editor.defaultFormatter": "scalameta.metals"
+    },
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java"
+    },
+    "cursor.cpp.enablePartialAccepts": true,
+    "docker.extension.enableComposeLanguageServer": false,
+    "git.autofetch": true,
+    "files.autoSave": "onWindowChange",
+    "editor.codeActionsOnSave": {},
+    "editor.codeActions.triggerOnFocusChange": true,
+    "css.format.spaceAroundSelectorSeparator": true,
+    "cursorpyright.analysis.autoImportCompletions": true,
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "java.configuration.runtimes": [],
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "workbench.colorTheme": "One Dark Pro Night Flat",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontFamily": "Monaco, Menlo, 'Courier New', monospace",
+    "git.enableSmartCommit": true,
+    "cursor.composer.shouldAutoAcceptDiffs": false,
+    "cursor.general.glassShowWarningNotifications": true,
+    "cursor.composer.shouldChimeAfterChatFinishes": true,
+    "cursor.composer.usageSummaryDisplay": "always",
+    "claudeCode.useTerminal": true,
+    "editor.accessibilitySupport": "off",
+    "window.autoDetectColorScheme": false,
+    "cursor.composer.shouldShowMarkdownHoverParticipantActions2": true,
+    "workbench.editorAssociations": {
+        "*.md": "vscode.markdown.preview.editor"
+    }
+}

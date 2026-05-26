@@ -1,0 +1,89 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "cmd+i",
+        "command": "composerMode.agent"
+    },
+    // Code navigation
+    {
+        "key": "cmd+[",
+        "command": "workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        "key": "ctrl+-",
+        "command": "-workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        "key": "cmd+]",
+        "command": "workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "ctrl+shift+-",
+        "command": "-workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "cmd+]",
+        "command": "-editor.action.indentLines",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    // Terminal control
+    {
+        "key": "cmd+t",
+        "command": "terminal.focus"
+    },
+    {
+        "key": "cmd+t",
+        "command": "-git.sync",
+        "when": "!operationInProgress"
+    },
+    {
+        "key": "cmd+t",
+        "command": "workbench.action.terminal.toggleTerminal",
+        "when": "terminal.active && terminalFocus"
+    },
+    // Create files and folder in explorer using keyboard similar to jetbrains IDE
+    {
+        "key": "cmd+n",
+        "command": "explorer.newFile",
+        "when": "explorerViewletFocus"
+    },
+    {
+        "key": "cmd+shift+n",
+        "command": "explorer.newFolder",
+        "when": "explorerViewletFocus"
+    },
+    {
+        "key": "cmd+n",
+        "command": "-editor.action.sourceAction",
+        "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+    },
+    // search files by name while in explorer view
+    // the default alt+cmd+f will still work
+    // this will override finding in the editor while in the explorer focus
+    // {
+    //     "key": "cmd+f",
+    //     "command": "list.find",
+    //     "when": "listFocus && listSupportsFind"
+    // },
+
+    // Make up and down cycle thourgh search results in `Shift+Ctrl+F` instead of search history
+    // ref: https://github.com/microsoft/vscode/issues/78655
+    { "key": "down", "command": "-history.showNext" },
+    { "key": "up", "command": "-history.showPrevious" },
+    { "key": "up", "command": "search.focus.previousInputBox", "when": "inputBoxFocus && searchViewletVisible" },
+    { "key": "down", "command": "search.focus.nextInputBox", "when": "inputBoxFocus && searchViewletVisible" },
+    { "key": "up", "command": "search.focus.previousInputBox", "when": "firstMatchFocus && searchViewletVisible" },
+    {
+        "key": "ctrl+up",
+        "command": "search.focus.previousInputBox",
+        "when": "searchViewletVisible"
+    },
+    {
+        "key": "cmd+l",
+        "command": "-workbench.action.gotoLine"
+    }
+]

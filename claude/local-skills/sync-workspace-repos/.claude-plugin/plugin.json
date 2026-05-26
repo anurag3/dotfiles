@@ -1,0 +1,8 @@
+{
+  "name": "sync-workspace-repos",
+  "description": "Switch all Claude Code workspace repositories to main branch and pull latest changes.",
+  "author": {
+    "name": "Anurag Desai",
+    "email": "anurag.desai@hginsights.com"
+  }
+}
