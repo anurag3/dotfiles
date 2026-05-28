@@ -33,10 +33,32 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false # Key repeat 
 defaults write NSGlobalDomain KeyRepeat -int 1                   # Fastest key repeat rate
 defaults write NSGlobalDomain InitialKeyRepeat -int 10           # Short delay before repeat starts
 
-# Trackpad — tap to click
-defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true                      # Built-in trackpad tap to click
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true    # Bluetooth trackpad tap to click
-defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1                         # Apply tap behavior for current user
+# Trackpad
+for domain in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothMultitouch.trackpad; do
+    defaults write $domain Clicking -bool true               # Tap to click
+    defaults write $domain DragLock -bool false              # Drag lock off
+    defaults write $domain Dragging -bool false              # Three-finger drag (handled below)
+    defaults write $domain TrackpadCornerSecondaryClick -int 0  # No corner right-click
+    defaults write $domain TrackpadFiveFingerPinchGesture -int 2
+    defaults write $domain TrackpadFourFingerHorizSwipeGesture -int 2
+    defaults write $domain TrackpadFourFingerPinchGesture -int 2
+    defaults write $domain TrackpadFourFingerVertSwipeGesture -int 2
+    defaults write $domain TrackpadHandResting -bool true    # Ignore accidental input while typing
+    defaults write $domain TrackpadHorizScroll -bool true    # Horizontal scrolling
+    defaults write $domain TrackpadMomentumScroll -bool true # Inertia scrolling
+    defaults write $domain TrackpadPinch -bool true          # Pinch to zoom
+    defaults write $domain TrackpadRightClick -bool true     # Two-finger right-click
+    defaults write $domain TrackpadRotate -bool true         # Rotate gesture
+    defaults write $domain TrackpadScroll -bool true         # Scrolling
+    defaults write $domain TrackpadThreeFingerDrag -bool true           # Three-finger drag
+    defaults write $domain TrackpadThreeFingerHorizSwipeGesture -int 0  # Disable three-finger swipe (using four-finger)
+    defaults write $domain TrackpadThreeFingerTapGesture -int 0         # Disable three-finger tap
+    defaults write $domain TrackpadThreeFingerVertSwipeGesture -int 0   # Disable three-finger vertical swipe
+    defaults write $domain TrackpadTwoFingerDoubleTapGesture -int 1     # Two-finger double-tap (smart zoom)
+    defaults write $domain TrackpadTwoFingerFromRightEdgeSwipeGesture -int 3  # Notification Centre swipe
+    defaults write $domain USBMouseStopsTrackpad -bool false # Don't disable trackpad when mouse connected
+done
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1        # Apply tap-to-click for current user
 
 # Screenshots
 mkdir -p ~/Documents/Screenshots
