@@ -20,6 +20,7 @@ open MIGRATION.md   # complete the manual steps
 - Copies dotfiles: `.zshrc`, `.gitconfig`, `.tmux.conf`, `.p10k.zsh`
 - Copies Claude Code config (`~/.claude/`)
 - Copies VSCode and Cursor settings + installs extensions
+- Copies Ghostty config
 - Installs pyenv Python 3.10.19
 - Installs Bun
 
@@ -40,6 +41,7 @@ dotfiles/
 │   ├── .tmux.conf
 │   └── .p10k.zsh
 ├── claude/           # ~/.claude/ subset
+├── ghostty/          # Ghostty terminal config
 ├── vscode/           # VSCode settings + extensions list
 └── cursor/           # Cursor settings + extensions list
 ```
