@@ -25,7 +25,7 @@ defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false  
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false    # Disable smart quotes
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false   # Disable auto-correct
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
-    -kill -r -domain local -domain system -domain user                           # Remove duplicates in "Open With" menu
+    -r -domain local -domain system -domain user                                 # Remove duplicates in "Open With" menu
 
 # Keyboard
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3         # Full keyboard access (Tab works in modal dialogs)
