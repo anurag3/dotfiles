@@ -28,7 +28,6 @@ brew "jq"
 brew "pre-commit"
 
 # Python
-brew "pyenv"
 brew "pipx"
 brew "uv"
 brew "pypy"
