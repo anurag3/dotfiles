@@ -1,0 +1,100 @@
+
+working-directory = home
+
+
+# ~/.config/ghostty/config
+# Ported from iTerm2 — Powerlevel10k + splits + tabs
+
+# ─────────────────────────────────────────
+# Font
+# Required for Powerlevel10k glyphs/icons
+# ─────────────────────────────────────────
+font-family = MesloLGS NF
+font-size = 13
+#font-thicken = true                  # macOS subpixel smoothing equivalent
+
+# ─────────────────────────────────────────
+# Color scheme
+# Option A: point at your exported theme
+#   theme = my-theme
+# Option B: use a built-in (run `ghostty +list-themes` to preview)
+#   theme = catppuccin-mocha
+# Option C: paste raw colors below (see conversion guide)
+# ─────────────────────────────────────────
+theme = Monokai Soda
+
+# ─────────────────────────────────────────
+# Window
+# ─────────────────────────────────────────
+window-decoration = true
+window-padding-x = 8
+window-padding-y = 8
+window-inherit-working-directory = false
+window-save-state = never
+
+# ─────────────────────────────────────────
+# Shell integration (auto-detects zsh)
+# Powers: prompt jumping, working-dir inheritance, semantic zones
+# NOTE: if your p10k theme uses a multi-line prompt and you see
+# glitchy tab completion, add: shell-integration-features = no-cursor
+# ─────────────────────────────────────────
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# ─────────────────────────────────────────
+# Cursor
+# ─────────────────────────────────────────
+cursor-style = bar
+cursor-style-blink = true
+
+# ─────────────────────────────────────────
+# Scrollback
+# ─────────────────────────────────────────
+scrollback-limit = 100000
+
+# ─────────────────────────────────────────
+# Tab bar
+# ─────────────────────────────────────────
+# shows when >1 tab is open, like iTerm2
+#tab-bar-style = auto
+
+# ─────────────────────────────────────────
+# Keybindings — matched to iTerm2 muscle memory
+# ─────────────────────────────────────────
+
+# Splits (iTerm2: cmd+d / cmd+shift+d)
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+
+# Navigate splits (iTerm2: cmd+opt+arrow)
+keybind = cmd+opt+left=goto_split:left
+keybind = cmd+opt+right=goto_split:right
+keybind = cmd+opt+up=goto_split:up
+keybind = cmd+opt+down=goto_split:down
+
+# Resize splits (iTerm2: cmd+ctrl+arrow)
+keybind = cmd+ctrl+left=resize_split:left,20
+keybind = cmd+ctrl+right=resize_split:right,20
+keybind = cmd+ctrl+up=resize_split:up,20
+keybind = cmd+ctrl+down=resize_split:down,20
+
+# Close split/pane
+keybind = cmd+w=close_surface
+
+# Tabs — cmd+t / cmd+shift+[ / cmd+shift+] match iTerm2 defaults already
+# These are Ghostty's defaults so no override needed:
+#   cmd+t          → new tab
+#   cmd+shift+[    → previous tab
+#   cmd+shift+]    → next tab
+#   cmd+1..9       → jump to tab N
+
+# Clear scrollback (iTerm2: cmd+k)
+keybind = cmd+k=clear_screen
+
+# ─────────────────────────────────────────
+# Clipboard
+# ─────────────────────────────────────────
+# warns before pasting multi-line commands
+clipboard-paste-protection = true
+clipboard-read = allow
+clipboard-write = allow

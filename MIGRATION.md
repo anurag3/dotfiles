@@ -78,13 +78,20 @@ These are not in Homebrew — reinstall from internal sources:
 - **Obsidian** — set up vault (iCloud or manual transfer).
 - **Pritunl** — add VPN profile from IT.
 
-## 7. iTerm2
+## 7. Ghostty Font
+
+Ghostty config requires **MesloLGS NF** for Powerlevel10k glyphs. Install before opening Ghostty:
+
+- Download from: https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k
+- Install all 4 font files, then restart Ghostty.
+
+## 8. iTerm2
 
 - Open iTerm2 → Preferences → General → Preferences → check "Load preferences from custom folder."
 - Point to a backup of `~/Library/Preferences/com.googlecode.iterm2.plist` from the old machine (transfer via AirDrop).
 - Or manually import Monokai Soda color scheme from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
 
-## 8. Cursor Extensions
+## 9. Cursor Extensions
 
 If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 
@@ -93,14 +100,14 @@ If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 xargs -L1 cursor --install-extension < ~/dotfiles/cursor/extensions.txt
 ```
 
-## 9. MDM / IT-managed Apps
+## 10. MDM / IT-managed Apps
 
 Wait for IT to push via JumpCloud:
 - Bitdefender Endpoint Security
 - JumpCloud agent
 - Any company-required certificates
 
-## 10. Verify
+## 11. Verify
 
 ```bash
 # Brew

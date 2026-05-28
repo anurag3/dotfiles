@@ -153,6 +153,14 @@ cp "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER/settings.json"
     cp -r "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/"
 
 ###############################################################################
+# Ghostty Config                                                              #
+###############################################################################
+echo "==> Copying Ghostty config..."
+GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
+mkdir -p "$GHOSTTY_DIR"
+cp "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
+
+###############################################################################
 # Cursor Settings                                                             #
 ###############################################################################
 echo "==> Copying Cursor settings..."
