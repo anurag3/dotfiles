@@ -68,8 +68,20 @@ killall SystemUIServer 2>/dev/null || true                                      
 
 # Finder
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true          # Always show file extensions
-defaults write com.apple.finder ShowPathbar -bool true                   # Show path bar at bottom of Finder
+defaults write com.apple.finder NewWindowTarget -string "PfHm"          # New windows open to home directory
+defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/" # Home directory path
+defaults write com.apple.finder ShowPathbar -bool true                   # Show path bar at bottom
+defaults write com.apple.finder ShowStatusBar -bool false                # Hide status bar
+defaults write com.apple.finder ShowSidebar -bool true                   # Show sidebar
+defaults write com.apple.finder SidebarWidth -int 196                   # Sidebar width
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"     # Default to list view
+defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"     # Group by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true           # Folders on top when sorting
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool false     # Don't show full path in title bar
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true  # Show external drives on desktop
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false     # Hide internal drives on desktop
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true  # Show removable media on desktop
+killall Finder 2>/dev/null || true
 
 # Dock
 defaults write com.apple.dock tilesize -int 36                           # Icon size: 36px
