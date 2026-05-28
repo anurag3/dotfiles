@@ -161,6 +161,7 @@ echo "==> Configuring git..."
 git config --global user.name "Anurag Desai"
 git config --global user.email "anurag.desai@hginsights.com"
 git config --global push.autoSetupRemote true
+git config --global url."git@github.com:".insteadOf "https://github.com/"  # Force SSH for GitHub (avoids HTTPS auth prompts for brew taps)
 git lfs install
 
 ###############################################################################
