@@ -162,15 +162,18 @@ alias docker-compose="docker compose"
 
 
 # Pyenv Settings <<<<<<<<<<<<
-# export PYENV_ROOT="$HOME/.pyenv"
-# command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-# # eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
-# # eval "$(pyenv init - zsh)"
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
+# pyenv shim — translates pyenv commands to uv
+pyenv() {
+  case "$1" in
+    install)  uv python install "${@:2}" ;;
+    local)    uv python pin "${@:2}" ;;
+    global)   uv python pin --global "${@:2}" ;;
+    versions) uv python list ;;
+    which)    uv python find "${@:2}" ;;
+    virtualenv) uv venv "${@:2}" ;;
+    *) command pyenv "$@" ;;
+  esac
+}
 
 
 # Postgres libpq [For airflow docker image]
