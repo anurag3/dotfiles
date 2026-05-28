@@ -153,6 +153,13 @@ cp "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER/settings.json"
     cp -r "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/"
 
 ###############################################################################
+# iTerm2 Prefs                                                                #
+###############################################################################
+echo "==> Configuring iTerm2 preferences..."
+defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm2"
+defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+
+###############################################################################
 # Ghostty Config                                                              #
 ###############################################################################
 echo "==> Copying Ghostty config..."

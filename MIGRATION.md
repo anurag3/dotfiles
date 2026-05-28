@@ -87,9 +87,7 @@ Ghostty config requires **MesloLGS NF** for Powerlevel10k glyphs. Install before
 
 ## 8. iTerm2
 
-- Open iTerm2 → Preferences → General → Preferences → check "Load preferences from custom folder."
-- Point to a backup of `~/Library/Preferences/com.googlecode.iterm2.plist` from the old machine (transfer via AirDrop).
-- Or manually import Monokai Soda color scheme from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
+Prefs are tracked in the repo (`iterm2/`). `setup.sh` points iTerm2 at that folder automatically — no manual steps needed. Just open iTerm2 after running the script.
 
 ## 9. Cursor Extensions
 

@@ -42,6 +42,7 @@ dotfiles/
 │   └── .p10k.zsh
 ├── claude/           # ~/.claude/ subset
 ├── ghostty/          # Ghostty terminal config
+├── iterm2/           # iTerm2 prefs (auto-synced by iTerm2 on quit)
 ├── vscode/           # VSCode settings + extensions list
 └── cursor/           # Cursor settings + extensions list
 ```
