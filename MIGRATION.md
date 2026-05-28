@@ -89,6 +89,8 @@ Ghostty config requires **MesloLGS NF** for Powerlevel10k glyphs. Install before
 
 Prefs are tracked in the repo (`iterm2/`). `setup.sh` points iTerm2 at that folder automatically — no manual steps needed. Just open iTerm2 after running the script.
 
+If the color scheme doesn't carry over, manually import Monokai Soda from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
+
 ## 9. Cursor Extensions
 
 If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
