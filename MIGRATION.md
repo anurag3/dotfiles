@@ -1,7 +1,5 @@
 # Migration Checklist
 
-After running `bash setup.sh`, complete these manual steps.
-
 ## 1. Apple ID & App Store
 
 - Sign in to App Store with your Apple ID.
@@ -32,7 +30,15 @@ chmod 600 ~/.ssh/*
 chmod 644 ~/.ssh/*.pub
 ```
 
-## 3. SDKMAN
+## 3. Run setup.sh
+
+```bash
+git clone git@github.com:anurag3/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+bash setup.sh
+```
+
+## 4. SDKMAN
 
 Install SDKMAN, then reinstall previous candidates. Current versions from old machine:
 
@@ -49,13 +55,13 @@ sdk install spark
 
 Check old machine first: `sdk current` for exact version pins.
 
-## 4. pipx Tools
+## 5. pipx Tools
 
 ```bash
 pipx install gimme-aws-creds
 ```
 
-## 5. Internal / Standalone CLIs
+## 6. Internal / Standalone CLIs
 
 These are not in Homebrew — reinstall from internal sources:
 
@@ -64,7 +70,7 @@ These are not in Homebrew — reinstall from internal sources:
 - `codecrafters` — from `codecrafters-io/tap` (already in Brewfile)
 - Standalone `kubectl` (if you need a version different from the brew one) — grab from kubernetes.io
 
-## 6. App Logins & Auth
+## 7. App Logins & Auth
 
 - **1Password** — set up first; it unlocks other credentials.
 - **Slack** — sign in to all workspaces.
@@ -80,20 +86,20 @@ These are not in Homebrew — reinstall from internal sources:
 - **Obsidian** — set up vault (iCloud or manual transfer).
 - **Pritunl** — add VPN profile from IT.
 
-## 7. Ghostty Font
+## 8. Ghostty Font
 
 Ghostty config requires **MesloLGS NF** for Powerlevel10k glyphs. Install before opening Ghostty:
 
 - Download from: https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k
 - Install all 4 font files, then restart Ghostty.
 
-## 8. iTerm2
+## 9. iTerm2
 
 Prefs are tracked in the repo (`iterm2/`). `setup.sh` points iTerm2 at that folder automatically — no manual steps needed. Just open iTerm2 after running the script.
 
 If the color scheme doesn't carry over, manually import Monokai Soda from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
 
-## 9. Cursor Extensions
+## 10. Cursor Extensions
 
 If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 
@@ -102,14 +108,14 @@ If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 xargs -L1 cursor --install-extension < ~/dotfiles/cursor/extensions.txt
 ```
 
-## 10. MDM / IT-managed Apps
+## 11. MDM / IT-managed Apps
 
 Wait for IT to push via JumpCloud:
 - Bitdefender Endpoint Security
 - JumpCloud agent
 - Any company-required certificates
 
-## 11. Verify
+## 12. Verify
 
 ```bash
 # Brew
@@ -121,8 +127,8 @@ git config --global user.email  # should be anurag.desai@hginsights.com
 # Shell
 echo $ZSH_THEME  # powerlevel10k/powerlevel10k
 
-# pyenv
-pyenv versions  # should list 3.10.19
+# UV (Python)
+uv python list
 
 # Bun
 bun --version
