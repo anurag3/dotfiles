@@ -8,8 +8,6 @@
 
 ## 2. Secure Config Transfer (old machine → new)
 
-> **Do this before running `setup.sh`** — Homebrew needs SSH keys to clone private/custom taps from GitHub. Without them, `brew bundle` will fail with an authentication error.
-
 Transfer these from the old machine via AirDrop or `scp`. **Do not commit to git.**
 
 ```bash
