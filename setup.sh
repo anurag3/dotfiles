@@ -161,14 +161,15 @@ cp "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER/settings.json"
 echo "==> Configuring iTerm2 preferences..."
 defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm2"
 defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+# iTerm2 already writes directly to the PrefsCustomFolder — no symlink needed
 
 ###############################################################################
 # Ghostty Config                                                              #
 ###############################################################################
-echo "==> Copying Ghostty config..."
+echo "==> Symlinking Ghostty config..."
 GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
 mkdir -p "$GHOSTTY_DIR"
-cp "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
+ln -sf "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
 
 ###############################################################################
 # Cursor Settings                                                             #
