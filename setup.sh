@@ -172,6 +172,23 @@ else
 fi
 
 ###############################################################################
+# Default Editor (Cursor)                                                     #
+###############################################################################
+echo "==> Setting Cursor as default text editor..."
+CURSOR_BUNDLE_ID=$(osascript -e 'id of app "Cursor"' 2>/dev/null)
+if [ -z "$CURSOR_BUNDLE_ID" ]; then
+    echo "    Cursor not found — skipping default editor setup. Re-run after installing Cursor."
+else
+    duti -s "$CURSOR_BUNDLE_ID" public.plain-text all      # Plain text files
+    duti -s "$CURSOR_BUNDLE_ID" public.text all            # All text UTIs
+    duti -s "$CURSOR_BUNDLE_ID" public.source-code all     # All source code UTIs
+    duti -s "$CURSOR_BUNDLE_ID" public.shell-script all    # Shell scripts
+    duti -s "$CURSOR_BUNDLE_ID" public.json all            # JSON files
+    duti -s "$CURSOR_BUNDLE_ID" public.xml all             # XML files
+    duti -s "$CURSOR_BUNDLE_ID" public.yaml all            # YAML files
+fi
+
+###############################################################################
 # Python version                                                              #
 ###############################################################################
 echo "==> Installing Python 3.10.19 via pyenv..."

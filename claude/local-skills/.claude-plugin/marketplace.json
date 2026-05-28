@@ -11,12 +11,6 @@
       "description": "Switch all workspace repos to main branch and pull latest changes",
       "source": "./sync-workspace-repos",
       "category": "productivity"
-    },
-    {
-      "name": "caveman",
-      "description": "Caveman switch to ultra-compressed communication mode",
-      "source": "./caveman",
-      "category": "productivity"
     }
   ]
 }
