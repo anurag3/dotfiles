@@ -4,7 +4,6 @@ tap "databricks/tap"
 tap "hginsights/tap"
 tap "jundot/omlx", "https://github.com/jundot/omlx"
 tap "FuJacob/cotabby"
-tap "terraform-linters/tflint"
 
 # Core utilities
 brew "ack"
@@ -47,7 +46,6 @@ brew "node"
 brew "rust"
 
 # Kubernetes / DevOps
-brew "terraform-linters/tflint/tflint"
 
 # AWS
 brew "awscli"
