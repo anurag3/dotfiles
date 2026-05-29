@@ -220,6 +220,12 @@ cp "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER/settings.json"
     cp -r "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/"
 
 ###############################################################################
+# Rectangle                                                                   #
+###############################################################################
+echo "==> Importing Rectangle settings..."
+defaults import com.knollsoft.Rectangle "$DOTFILES_DIR/rectangle/com.knollsoft.Rectangle.plist"
+
+###############################################################################
 # iTerm2 Prefs                                                                #
 ###############################################################################
 echo "==> Configuring iTerm2 preferences..."
