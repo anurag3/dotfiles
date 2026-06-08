@@ -10,7 +10,7 @@ working-directory = home
 # Required for Powerlevel10k glyphs/icons
 # ─────────────────────────────────────────
 font-family = MesloLGS NF
-font-size = 13
+font-size = 14
 #font-thicken = true                  # macOS subpixel smoothing equivalent
 
 # ─────────────────────────────────────────
