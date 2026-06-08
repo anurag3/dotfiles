@@ -234,6 +234,12 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 # iTerm2 already writes directly to the PrefsCustomFolder — no symlink needed
 
 ###############################################################################
+# Tmux Config                                                                 #
+###############################################################################
+echo "==> Symlinking Tmux config..."
+ln -sf "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
+
+###############################################################################
 # Ghostty Config                                                              #
 ###############################################################################
 echo "==> Symlinking Ghostty config..."
