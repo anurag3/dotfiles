@@ -283,6 +283,24 @@ fi
 echo "==> Installing Bun..."
 [ -d "$HOME/.bun" ] || curl -fsSL https://bun.sh/install | bash
 
+###############################################################################
+# Text Replacements                                                           #
+###############################################################################
+echo "==> Setting text replacements..."
+defaults write -g NSUserReplacementItems -array \
+  '{ replace = "->"; with = "\U2192"; }' \
+  '{ replace = "@g"; with = "aadesai92@gmail.com"; }' \
+  '{ replace = "@git"; with = "https://github.com/anurag3"; }' \
+  '{ replace = "@h"; with = "anurag.desai@hginsights.com"; }' \
+  '{ replace = "@link"; with = "https://www.linkedin.com/in/anuragdesai/"; }' \
+  '{ replace = "@o"; with = "anurag.desai@outlook.com"; }' \
+  '{ replace = "@w"; with = "adesai@wpi.edu"; }' \
+  '{ replace = "omw"; with = "On my way!"; }' \
+  '{ replace = "tix"; with = "ticket"; }' \
+  '{ replace = "tixs"; with = "tickets"; }' \
+  '{ replace = "txn"; with = "transaction"; }' \
+  '{ replace = "txns"; with = "transactions"; }'
+
 echo ""
 echo "✓ Setup complete."
 echo "  Next: open MIGRATION.md and work through the manual steps."
