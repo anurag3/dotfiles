@@ -105,7 +105,6 @@ cask "sublime-text"
 cask "visual-studio-code"
 
 # System / menu bar
-cask "caffeine"
 cask "cloudflare-warp"
 cask "keepingyouawake"
 cask "logi-options-plus"
