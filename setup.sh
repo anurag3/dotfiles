@@ -58,6 +58,7 @@ for domain in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothM
     defaults write $domain TrackpadTwoFingerFromRightEdgeSwipeGesture -int 3  # Notification Centre swipe
     defaults write $domain USBMouseStopsTrackpad -bool false # Don't disable trackpad when mouse connected
 done
+defaults write com.apple.dock showAppExposeGestureEnabled -bool true  # Four-finger swipe down for App Exposé
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1        # Apply tap-to-click for current user
 
 # Screenshots
