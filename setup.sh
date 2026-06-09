@@ -226,6 +226,12 @@ echo "==> Importing Rectangle settings..."
 defaults import com.knollsoft.Rectangle "$DOTFILES_DIR/rectangle/com.knollsoft.Rectangle.plist"
 
 ###############################################################################
+# Spotlight                                                                   #
+###############################################################################
+echo "==> Importing Spotlight settings..."
+defaults import com.apple.Spotlight "$DOTFILES_DIR/spotlight/com.apple.Spotlight.plist"
+
+###############################################################################
 # iTerm2 Prefs                                                                #
 ###############################################################################
 echo "==> Configuring iTerm2 preferences..."
