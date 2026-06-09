@@ -296,6 +296,25 @@ else
 fi
 
 ###############################################################################
+# Claude Code Status Line                                                     #
+###############################################################################
+echo "==> Configuring Claude Code status line..."
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+mkdir -p "$HOME/.claude"
+if [ -f "$CLAUDE_SETTINGS" ]; then
+    python3 -c "
+import json
+with open('$CLAUDE_SETTINGS') as f:
+    s = json.load(f)
+s['statusLine'] = {'type': 'command', 'command': 'bunx -y ccstatusline@latest', 'padding': 0, 'refreshInterval': 1}
+with open('$CLAUDE_SETTINGS', 'w') as f:
+    json.dump(s, f, indent=2)
+"
+else
+    echo '{"statusLine":{"type":"command","command":"bunx -y ccstatusline@latest","padding":0,"refreshInterval":1}}' > "$CLAUDE_SETTINGS"
+fi
+
+###############################################################################
 # Default Editor (Cursor)                                                     #
 ###############################################################################
 echo "==> Setting Cursor as default text editor..."
