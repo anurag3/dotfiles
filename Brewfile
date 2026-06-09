@@ -124,7 +124,6 @@ cask "windows-app"
 
 # Media
 cask "firefox"
-cask "google-chrome"
 cask "vlc"
 
 # VSCode extensions (installed automatically by `brew bundle`)
