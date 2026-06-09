@@ -113,7 +113,22 @@ Wait for IT to push via JumpCloud:
 - JumpCloud agent
 - Any company-required certificates
 
-## 12. Verify
+## 12. Claude Code Status Line
+
+Add the following to `~/.claude/settings.json` (merge into the existing JSON object):
+
+```json
+"statusLine": {
+  "type": "command",
+  "command": "bunx -y ccstatusline@latest",
+  "padding": 0,
+  "refreshInterval": 1
+}
+```
+
+Requires Bun (installed by `setup.sh`). The status line will auto-download `ccstatusline` on first use.
+
+## 13. Verify
 
 ```bash
 # Brew
