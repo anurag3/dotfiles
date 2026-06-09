@@ -3,7 +3,6 @@ tap "codecrafters-io/tap"
 tap "databricks/tap"
 tap "hginsights/tap"
 tap "jundot/omlx", "https://github.com/jundot/omlx"
-tap "FuJacob/cotabby"
 
 # Core utilities
 brew "ack"
@@ -89,9 +88,7 @@ cask "rectangle"
 cask "thaw"
 
 # Dev tools
-cask "boop"
 cask "clickhouse"
-cask "cotabby"
 cask "cursor"
 cask "docker"
 cask "ghostty"
