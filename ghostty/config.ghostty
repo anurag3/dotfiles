@@ -95,6 +95,6 @@ keybind = cmd+k=clear_screen
 # Clipboard
 # ─────────────────────────────────────────
 # warns before pasting multi-line commands
-clipboard-paste-protection = true
+#clipboard-paste-protection = true
 clipboard-read = allow
 clipboard-write = allow
