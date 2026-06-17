@@ -1,4 +1,5 @@
 tap "atlassian/acli"
+tap "vorssaint/tap"
 tap "codecrafters-io/tap"
 tap "databricks/tap"
 tap "hginsights/tap"
@@ -77,9 +78,9 @@ brew "rtk"
 # ------- Apps -------
 
 # Productivity
+cask "vorssaint/tap/vorssaint"
 cask "1password"
 cask "appcleaner"
-cask "arc"
 cask "asana"
 cask "calibre"
 cask "clipy"

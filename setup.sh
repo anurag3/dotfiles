@@ -228,6 +228,12 @@ echo "==> Importing Rectangle settings..."
 defaults import com.knollsoft.Rectangle "$DOTFILES_DIR/rectangle/com.knollsoft.Rectangle.plist"
 
 ###############################################################################
+# Vorssaint                                                                   #
+###############################################################################
+echo "==> Importing Vorssaint settings..."
+defaults import com.vorssaint.utils "$DOTFILES_DIR/vorssaint/com.vorssaint.utils.plist"
+
+###############################################################################
 # Spotlight                                                                   #
 ###############################################################################
 echo "==> Setting Spotlight search categories..."

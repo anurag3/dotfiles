@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>batteryLimitPercent</key>
+	<integer>20</integer>
+	<key>clamshellPreferred</key>
+	<false/>
+	<key>defaultDurationMinutes</key>
+	<integer>0</integer>
+	<key>finderCutPasteEnabled</key>
+	<true/>
+	<key>menuBarCPU</key>
+	<true/>
+	<key>menuBarGPU</key>
+	<false/>
+	<key>menuBarMemory</key>
+	<true/>
+	<key>menuBarMemoryStyle</key>
+	<string>percent</string>
+	<key>monitorGraphBattery</key>
+	<false/>
+	<key>monitorGraphGPU</key>
+	<false/>
+	<key>monitorGraphNetwork</key>
+	<false/>
+	<key>monitorGraphPower</key>
+	<false/>
+	<key>monitorIntervalSeconds</key>
+	<integer>1</integer>
+	<key>panelNavigationEnabled</key>
+	<true/>
+	<key>showCountdownInMenuBar</key>
+	<false/>
+	<key>switcherEnabled</key>
+	<false/>
+	<key>vorssDisabledSleep</key>
+	<false/>
+</dict>
+</plist>
