@@ -92,7 +92,7 @@ cask "thaw"
 # Dev tools
 cask "clickhouse"
 cask "cursor"
-cask "docker"
+cask "docker-desktop"
 cask "ghostty"
 cask "github"
 cask "iterm2"
@@ -104,7 +104,7 @@ cask "visual-studio-code"
 
 # System / menu bar
 cask "cloudflare-warp"
-cask "logi-options-plus"
+cask "logi-options+"
 cask "monitorcontrol"
 cask "stats"
 
