@@ -97,6 +97,7 @@ defaults write com.apple.dock show-recents -bool false                   # Don't
 defaults write com.apple.dock magnification -bool true                   # Enable dock magnification on hover
 defaults write com.apple.dock mru-spaces -bool false                     # Don't rearrange Spaces based on recent use
 defaults write com.apple.dock expose-group-apps -bool false              # Mission Control: don't group windows by app
+dockutil --add ~/Downloads --view auto --display folder --sort dateadded --replacing Downloads 2>/dev/null || true
 killall Dock 2>/dev/null || true
 
 # Activity Monitor
