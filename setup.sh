@@ -318,6 +318,19 @@ echo "==> Installing Bun..."
 [ -d "$HOME/.bun" ] || curl -fsSL https://bun.sh/install | bash
 
 ###############################################################################
+# Sublime Text Settings                                                       #
+###############################################################################
+echo "==> Symlinking Sublime Text settings..."
+ST_USER="$HOME/Library/Application Support/Sublime Text/Packages/User"
+if [ -d "$ST_USER" ]; then
+    ln -sf "$DOTFILES_DIR/sublime-text/Preferences.sublime-settings" "$ST_USER/Preferences.sublime-settings"
+    ln -sf "$DOTFILES_DIR/sublime-text/Package Control.sublime-settings" "$ST_USER/Package Control.sublime-settings"
+    echo "    Symlinks created. Packages auto-install on next ST launch."
+else
+    echo "    Sublime Text not found — open it once to create the User dir, then re-run."
+fi
+
+###############################################################################
 # Text Replacements                                                           #
 ###############################################################################
 echo "==> Setting text replacements..."

@@ -97,7 +97,21 @@ Prefs are tracked in the repo (`iterm2/`). `setup.sh` points iTerm2 at that fold
 
 If the color scheme doesn't carry over, manually import Monokai Soda from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
 
-## 10. Cursor Extensions
+## 10. Sublime Text
+
+Installed via Brewfile. Settings are copied by `setup.sh` — but ST must have run once first to create the `Packages/User/` directory.
+
+If `setup.sh` printed "Sublime Text not found":
+```bash
+# Open ST once, then:
+ST_USER="$HOME/Library/Application Support/Sublime Text/Packages/User"
+ln -sf ~/dotfiles/sublime-text/Preferences.sublime-settings "$ST_USER/Preferences.sublime-settings"
+ln -sf ~/dotfiles/sublime-text/"Package Control.sublime-settings" "$ST_USER/Package Control.sublime-settings"
+```
+
+Restart ST — Package Control auto-installs: `Indent XML`, `IndentX`, `Pretty JSON`.
+
+## 11. Cursor Extensions
 
 If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 
@@ -106,14 +120,14 @@ If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 xargs -L1 cursor --install-extension < ~/dotfiles/cursor/extensions.txt
 ```
 
-## 11. MDM / IT-managed Apps
+## 12. MDM / IT-managed Apps
 
 Wait for IT to push via JumpCloud:
 - Bitdefender Endpoint Security
 - JumpCloud agent
 - Any company-required certificates
 
-## 12. Claude Code Status Line
+## 13. Claude Code Status Line
 
 Add the following to `~/.claude/settings.json` (merge into the existing JSON object):
 
@@ -128,7 +142,7 @@ Add the following to `~/.claude/settings.json` (merge into the existing JSON obj
 
 Requires Bun (installed by `setup.sh`). The status line will auto-download `ccstatusline` on first use.
 
-## 13. Verify
+## 14. Verify
 
 ```bash
 # Brew
