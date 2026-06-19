@@ -90,12 +90,9 @@ cask "rectangle"
 cask "thaw"
 
 # Dev tools
-cask "clickhouse"
 cask "cursor"
-cask "docker-desktop"
 cask "ghostty"
 cask "github"
-cask "iterm2"
 cask "jetbrains-toolbox"
 cask "lm-studio"
 cask "postman"
