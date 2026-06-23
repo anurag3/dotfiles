@@ -207,6 +207,7 @@ defaults import com.vorssaint.utils "$DOTFILES_DIR/vorssaint/com.vorssaint.utils
 ###############################################################################
 # Spotlight                                                                   #
 ###############################################################################
+# To reset Spotlight to defaults: defaults delete com.apple.Spotlight orderedItems && sudo killall mds
 echo "==> Setting Spotlight search categories..."
 defaults write com.apple.Spotlight orderedItems -array \
   '{ enabled = 1; name = APPLICATIONS; }' \
