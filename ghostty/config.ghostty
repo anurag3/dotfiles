@@ -1,100 +1,165 @@
+# ═════════════════════════════════════════
+# GENERAL
+# ═════════════════════════════════════════
 
+# Open new windows in home directory
 working-directory = home
 
+# Close panes/tabs without confirmation prompt
+confirm-close-surface = false
 
-# ~/.config/ghostty/config
-# Ported from iTerm2 — Powerlevel10k + splits + tabs
 
-# ─────────────────────────────────────────
-# Font
-# Required for Powerlevel10k glyphs/icons
-# ─────────────────────────────────────────
-font-family = MesloLGS NF
-font-size = 14
-#font-thicken = true                  # macOS subpixel smoothing equivalent
+# ═════════════════════════════════════════
+# APPEARANCE
+# ═════════════════════════════════════════
 
-# ─────────────────────────────────────────
-# Color scheme
-# Option A: point at your exported theme
-#   theme = my-theme
-# Option B: use a built-in (run `ghostty +list-themes` to preview)
-#   theme = catppuccin-mocha
-# Option C: paste raw colors below (see conversion guide)
-# ─────────────────────────────────────────
+# ── Theme ─────────────────────────────────
+
+# Built-in theme (run `ghostty +list-themes` to browse)
 theme = Monokai Soda
 
-# ─────────────────────────────────────────
-# Window
-# ─────────────────────────────────────────
+# ── Font ──────────────────────────────────
+
+# Nerd Font patched variant — required for Powerlevel10k glyphs/icons
+font-family = MesloLGS NF
+
+# Point size
+font-size = 15
+
+# macOS subpixel smoothing equivalent (enable for thin displays)
+font-thicken = false
+
+
+# ═════════════════════════════════════════
+# WINDOW
+# ═════════════════════════════════════════
+
+# ── Chrome ────────────────────────────────
+
+# Native macOS title bar and traffic lights
 window-decoration = true
+
+# Show tab bar when >1 tab is open (like iTerm2)
+macos-titlebar-style = tabs
+
+# ── Padding ───────────────────────────────
+
+# Horizontal inner padding (px)
 window-padding-x = 8
+
+# Vertical inner padding (px)
 window-padding-y = 8
+
+# ── Behavior ──────────────────────────────
+
+# New windows always start in working-directory above
 window-inherit-working-directory = false
+
+# Don't restore previous session on launch
 window-save-state = never
 
-# ─────────────────────────────────────────
-# Shell integration (auto-detects zsh)
-# Powers: prompt jumping, working-dir inheritance, semantic zones
-# NOTE: if your p10k theme uses a multi-line prompt and you see
-# glitchy tab completion, add: shell-integration-features = no-cursor
-# ─────────────────────────────────────────
+
+# ═════════════════════════════════════════
+# SHELL INTEGRATION
+# ═════════════════════════════════════════
+
+# Auto-detects zsh; enables prompt jumping, working-dir inheritance, semantic zones
+# Tip: if p10k multi-line prompt causes glitchy tab completion, set:
+#   shell-integration-features = no-cursor
 shell-integration = detect
+
+# Sync cursor shape, sudo prompt, and window title
 shell-integration-features = cursor,sudo,title
 
-# ─────────────────────────────────────────
-# Cursor
-# ─────────────────────────────────────────
+
+# ═════════════════════════════════════════
+# CURSOR
+# ═════════════════════════════════════════
+
+# Thin vertical bar (vs block or underline)
 cursor-style = bar
+
+# Animate cursor blink
 cursor-style-blink = true
 
-# ─────────────────────────────────────────
-# Scrollback
-# ─────────────────────────────────────────
+
+# ═════════════════════════════════════════
+# SCROLLBACK
+# ═════════════════════════════════════════
+
+# Lines of scrollback history to retain
 scrollback-limit = 100000
 
-# ─────────────────────────────────────────
-# Tab bar
-# ─────────────────────────────────────────
-# shows when >1 tab is open, like iTerm2
-#tab-bar-style = auto
 
-# ─────────────────────────────────────────
-# Keybindings — matched to iTerm2 muscle memory
-# ─────────────────────────────────────────
+# ═════════════════════════════════════════
+# CLIPBOARD
+# ═════════════════════════════════════════
 
-# Splits (iTerm2: cmd+d / cmd+shift+d)
+# Warn before pasting multi-line commands
+clipboard-paste-protection = true
+
+# Allow apps to read clipboard
+clipboard-read = allow
+
+# Allow apps to write clipboard
+clipboard-write = allow
+
+# Auto-copy selected text (like iTerm2)
+copy-on-select = clipboard
+
+
+# ═════════════════════════════════════════
+# MACOS
+# ═════════════════════════════════════════
+
+# Send Option as Alt/Meta — critical for readline shortcuts (opt+b/f/d) in SSH sessions
+macos-option-as-alt = true
+
+
+# ═════════════════════════════════════════
+# KEYBINDINGS
+# ═════════════════════════════════════════
+
+# ── Clipboard ─────────────────────────────
+
+# Workaround for search buffer paste bug
+keybind = super+v=paste_from_clipboard
+
+# ── Scrollback ────────────────────────────
+
+# Clear scrollback buffer (matches iTerm2 cmd+k)
+keybind = cmd+k=clear_screen
+
+# ── URLs ──────────────────────────────────
+
+# Make URLs in terminal output clickable
+link-url = true
+
+# ── Splits ────────────────────────────────
+
+# New vertical split (matches iTerm2 cmd+d)
 keybind = cmd+d=new_split:right
+
+# New horizontal split (matches iTerm2 cmd+shift+d)
 keybind = cmd+shift+d=new_split:down
 
-# Navigate splits (iTerm2: cmd+opt+arrow)
+# ── Navigate Splits ───────────────────────
+
+# Focus split left/right/up/down (matches iTerm2 cmd+opt+arrow)
 keybind = cmd+opt+left=goto_split:left
 keybind = cmd+opt+right=goto_split:right
 keybind = cmd+opt+up=goto_split:up
 keybind = cmd+opt+down=goto_split:down
 
-# Resize splits (iTerm2: cmd+ctrl+arrow)
+# ── Resize Splits ─────────────────────────
+
+# Resize split in direction (matches iTerm2 cmd+ctrl+arrow)
 keybind = cmd+ctrl+left=resize_split:left,20
 keybind = cmd+ctrl+right=resize_split:right,20
 keybind = cmd+ctrl+up=resize_split:up,20
 keybind = cmd+ctrl+down=resize_split:down,20
 
-# Close split/pane
+# ── Pane Management ───────────────────────
+
+# Close focused split or tab
 keybind = cmd+w=close_surface
-
-# Tabs — cmd+t / cmd+shift+[ / cmd+shift+] match iTerm2 defaults already
-# These are Ghostty's defaults so no override needed:
-#   cmd+t          → new tab
-#   cmd+shift+[    → previous tab
-#   cmd+shift+]    → next tab
-#   cmd+1..9       → jump to tab N
-
-# Clear scrollback (iTerm2: cmd+k)
-keybind = cmd+k=clear_screen
-
-# ─────────────────────────────────────────
-# Clipboard
-# ─────────────────────────────────────────
-# warns before pasting multi-line commands
-#clipboard-paste-protection = true
-clipboard-read = allow
-clipboard-write = allow

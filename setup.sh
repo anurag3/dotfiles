@@ -160,37 +160,37 @@ echo "==> Installing zsh plugins..."
 ###############################################################################
 # Dotfiles                                                                    #
 ###############################################################################
-echo "==> Copying dotfiles..."
-cp "$DOTFILES_DIR/home/.zshrc"    "$HOME/.zshrc"
-cp "$DOTFILES_DIR/home/.gitconfig" "$HOME/.gitconfig"
-cp "$DOTFILES_DIR/home/.tmux.conf" "$HOME/.tmux.conf"
-cp "$DOTFILES_DIR/home/.p10k.zsh"  "$HOME/.p10k.zsh"
+echo "==> Symlinking dotfiles..."
+ln -sf "$DOTFILES_DIR/home/.zshrc"     "$HOME/.zshrc"
+ln -sf "$DOTFILES_DIR/home/.gitconfig" "$HOME/.gitconfig"
+ln -sf "$DOTFILES_DIR/home/.tmux.conf" "$HOME/.tmux.conf"
+ln -sf "$DOTFILES_DIR/home/.p10k.zsh"  "$HOME/.p10k.zsh"
 
 ###############################################################################
 # Claude Code Config                                                          #
 ###############################################################################
-echo "==> Copying Claude config..."
+echo "==> Symlinking Claude config..."
 mkdir -p "$HOME/.claude"
-cp "$DOTFILES_DIR/claude/CLAUDE.md"            "$HOME/.claude/CLAUDE.md"
-cp "$DOTFILES_DIR/claude/RTK.md"               "$HOME/.claude/RTK.md"
-cp "$DOTFILES_DIR/claude/settings.json"        "$HOME/.claude/settings.json"
-cp "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
+ln -sf "$DOTFILES_DIR/claude/CLAUDE.md"             "$HOME/.claude/CLAUDE.md"
+ln -sf "$DOTFILES_DIR/claude/RTK.md"                "$HOME/.claude/RTK.md"
+ln -sf "$DOTFILES_DIR/claude/settings.json"         "$HOME/.claude/settings.json"
+ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 [ -d "$DOTFILES_DIR/claude/hooks" ] && \
-    cp -r "$DOTFILES_DIR/claude/hooks" "$HOME/.claude/"
-[ -d "$DOTFILES_DIR/claude/local-skills" ] && \
-    cp -r "$DOTFILES_DIR/claude/local-skills" "$HOME/.claude/"
+    ln -sf "$DOTFILES_DIR/claude/hooks"   "$HOME/.claude/hooks"
+[ -d "$DOTFILES_DIR/claude/skills" ] && \
+    ln -sf "$DOTFILES_DIR/claude/skills"  "$HOME/.claude/skills"
 
 ###############################################################################
 # VSCode Settings                                                             #
 ###############################################################################
-echo "==> Copying VSCode settings..."
+echo "==> Symlinking VSCode settings..."
 VSCODE_USER="$HOME/Library/Application Support/Code/User"
 mkdir -p "$VSCODE_USER"
-cp "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER/settings.json"
+ln -sf "$DOTFILES_DIR/vscode/settings.json"    "$VSCODE_USER/settings.json"
 [ -f "$DOTFILES_DIR/vscode/keybindings.json" ] && \
-    cp "$DOTFILES_DIR/vscode/keybindings.json" "$VSCODE_USER/keybindings.json"
+    ln -sf "$DOTFILES_DIR/vscode/keybindings.json" "$VSCODE_USER/keybindings.json"
 [ -d "$DOTFILES_DIR/vscode/snippets" ] && \
-    cp -r "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/"
+    ln -sf "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/snippets"
 
 ###############################################################################
 # Rectangle                                                                   #
@@ -244,12 +244,6 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 # iTerm2 already writes directly to the PrefsCustomFolder — no symlink needed
 
 ###############################################################################
-# Tmux Config                                                                 #
-###############################################################################
-echo "==> Symlinking Tmux config..."
-ln -sf "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
-
-###############################################################################
 # Ghostty Config                                                              #
 ###############################################################################
 echo "==> Symlinking Ghostty config..."
@@ -260,14 +254,14 @@ ln -sf "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
 ###############################################################################
 # Cursor Settings                                                             #
 ###############################################################################
-echo "==> Copying Cursor settings..."
+echo "==> Symlinking Cursor settings..."
 CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
 mkdir -p "$CURSOR_USER"
-cp "$DOTFILES_DIR/cursor/settings.json" "$CURSOR_USER/settings.json"
+ln -sf "$DOTFILES_DIR/cursor/settings.json"    "$CURSOR_USER/settings.json"
 [ -f "$DOTFILES_DIR/cursor/keybindings.json" ] && \
-    cp "$DOTFILES_DIR/cursor/keybindings.json" "$CURSOR_USER/keybindings.json"
+    ln -sf "$DOTFILES_DIR/cursor/keybindings.json" "$CURSOR_USER/keybindings.json"
 [ -d "$DOTFILES_DIR/cursor/snippets" ] && \
-    cp -r "$DOTFILES_DIR/cursor/snippets" "$CURSOR_USER/"
+    ln -sf "$DOTFILES_DIR/cursor/snippets" "$CURSOR_USER/snippets"
 
 echo "==> Installing Cursor extensions..."
 if command -v cursor &>/dev/null; then

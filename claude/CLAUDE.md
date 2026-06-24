@@ -24,6 +24,8 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
+- YAGNI: never implement something "for future use" — only what's needed right now.
+- Prefer one-liners over multi-line solutions when clarity isn't sacrificed.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 

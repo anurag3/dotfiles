@@ -103,7 +103,6 @@ cask "visual-studio-code"
 cask "cloudflare-warp"
 cask "logi-options+"
 cask "monitorcontrol"
-cask "stats"
 
 # AI tools
 cask "claude"

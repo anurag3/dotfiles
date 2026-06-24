@@ -5,9 +5,9 @@
     "editor.fontFamily": "Monaco, Menlo, 'Courier New', monospace",
     "editor.fontSize": 14,
     "files.watcherExclude": {
-        "**/.bloop": true,
-        "**/.metals": true,
-        "**/.ammonite": true
+        "**/.ammonite": true,
+        "**/.bloop/**": true,
+        "**/.metals/**/*.{java,scala}": true
     },
     "github.copilot.selectedCompletionModel": "",
     "github.copilot.chat.codesearch.enabled": true,
@@ -83,6 +83,7 @@
     "window.autoDetectColorScheme": false,
     "cursor.composer.shouldShowMarkdownHoverParticipantActions2": true,
     "workbench.editorAssociations": {
-        "*.md": "vscode.markdown.preview.editor"
-    }
+        "*.md": "markdownForHumans.editor"
+    },
+    "redhat.telemetry.enabled": false
 }
