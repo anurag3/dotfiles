@@ -7,6 +7,7 @@ tap "jundot/omlx", "https://github.com/jundot/omlx"
 
 # Core utilities
 brew "ack"
+brew "ripgrep"
 brew "duti"
 brew "cmake"
 brew "curl"
