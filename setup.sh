@@ -184,6 +184,14 @@ ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-co
     ln -sf "$DOTFILES_DIR/claude/skills"  "$HOME/.claude/skills"
 
 ###############################################################################
+# Neovim Config                                                               #
+###############################################################################
+echo "==> Symlinking Neovim config..."
+mkdir -p "$HOME/.config"
+rm -rf "$HOME/.config/nvim"
+ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+
+###############################################################################
 # VSCode Settings                                                             #
 ###############################################################################
 echo "==> Symlinking VSCode settings..."
