@@ -176,8 +176,10 @@ ln -sf "$DOTFILES_DIR/claude/RTK.md"                "$HOME/.claude/RTK.md"
 ln -sf "$DOTFILES_DIR/claude/settings.json"         "$HOME/.claude/settings.json"
 ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 [ -d "$DOTFILES_DIR/claude/hooks" ] && \
+    rm -rf "$HOME/.claude/hooks" && \
     ln -sf "$DOTFILES_DIR/claude/hooks"   "$HOME/.claude/hooks"
 [ -d "$DOTFILES_DIR/claude/skills" ] && \
+    rm -rf "$HOME/.claude/skills" && \
     ln -sf "$DOTFILES_DIR/claude/skills"  "$HOME/.claude/skills"
 
 ###############################################################################
