@@ -1,4 +1,5 @@
 @RTK.md
+
 # CLAUDE.md
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
@@ -10,6 +11,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
+
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
@@ -24,7 +26,7 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
-- YAGNI: never implement something "for future use" — only what's needed right now.
+- Always follow YAGNI principles: never implement something "for future use" — only what's needed right now.
 - Prefer one-liners over multi-line solutions when clarity isn't sacrificed.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
@@ -34,12 +36,14 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 **Touch only what you must. Clean up only your own mess.**
 
 When editing existing code:
+
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
 - If you notice unrelated dead code, mention it - don't delete it.
 
 When your changes create orphans:
+
 - Remove imports/variables/functions that YOUR changes made unused.
 - Don't remove pre-existing dead code unless asked.
 
@@ -50,11 +54,13 @@ The test: Every changed line should trace directly to the user's request.
 **Define success criteria. Loop until verified.**
 
 Transform tasks into verifiable goals:
+
 - "Add validation" → "Write tests for invalid inputs, then make them pass"
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
 - "Refactor X" → "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
+
 ```
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
@@ -66,7 +72,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
-
 
 # Plan File Location
 
@@ -84,13 +89,14 @@ Plan mode's "only this file may be edited" restriction still applies, but it app
 
 ### Deriving path components
 
-**`<repo>`** — run in order, use the first that succeeds:
+`**<repo>**` — run in order, use the first that succeeds:
+
 1. `git remote get-url origin` → extract the repo name (last path segment, strip `.git`)
 2. `basename "$PWD"` — use the current directory name if no remote
 
-**`<YYYY-MM-DD>`** — today's date in ISO format (from the `currentDate` context or `date +%F`)
+`**<YYYY-MM-DD>**` — today's date in ISO format (from the `currentDate` context or `date +%F`)
 
-**`<plan_description>`** — 2–5 word kebab-case summary of what the plan is for (e.g. `add-auth-middleware`, `migrate-db-schema`)
+`**<plan_description>**` — 2–5 word kebab-case summary of what the plan is for (e.g. `add-auth-middleware`, `migrate-db-schema`)
 
 ### Required steps before writing any plan file
 

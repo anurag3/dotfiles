@@ -217,9 +217,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
-fpath=(/Users/anurag.desai/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
+# fpath=(/Users/anurag.desai/.docker/completions $fpath)
+# autoload -Uz compinit
+# compinit
 # End of Docker CLI completions
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
