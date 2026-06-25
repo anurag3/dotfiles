@@ -3,8 +3,9 @@ set -e
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Ask for the administrator password upfront
+# Ask for the administrator password upfront and keep the session alive
 sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 ###############################################################################
 # macOS Defaults                                                              #
