@@ -149,6 +149,18 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 # docker-compose alias
 alias docker-compose="docker compose"
 
+# Git shorthands
+alias gs='git status'
+alias ga='git add'
+alias gd='git diff'
+alias gc='git commit'
+alias gp='git pull'
+alias gps='git push'
+alias gb='git branch'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gl='git log --oneline --graph --decorate'
+
 # HG Settings >>>>>>>>>>>>
 
 # forward SSH keys for github push/pull on jumpbox
