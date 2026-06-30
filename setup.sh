@@ -167,6 +167,9 @@ ln -sf "$DOTFILES_DIR/home/.gitconfig" "$HOME/.gitconfig"
 ln -sf "$DOTFILES_DIR/home/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES_DIR/home/.p10k.zsh"  "$HOME/.p10k.zsh"
 
+mkdir -p "$HOME/.local/bin"
+ln -sf "$DOTFILES_DIR/home/.local/bin/claude-workspace" "$HOME/.local/bin/claude-workspace"
+
 ###############################################################################
 # Claude Code Config                                                          #
 ###############################################################################

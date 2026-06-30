@@ -1,0 +1,52 @@
+#!/bin/bash
+# claude-workspace: Launch Claude Code from a Cursor .code-workspace file
+# Usage: claude-workspace [path/to/file.code-workspace]
+
+WORKSPACE_FILE="${1}"
+
+# If no arg given, find the first .code-workspace in current dir
+if [ -z "$WORKSPACE_FILE" ]; then
+  WORKSPACE_FILE=$(find . -maxdepth 1 -name "*.code-workspace" | head -1)
+fi
+
+if [ -z "$WORKSPACE_FILE" ]; then
+  echo "No .code-workspace file found. Pass one as an argument."
+  exit 1
+fi
+
+echo "Loading workspace: $WORKSPACE_FILE"
+
+# Extract all folder paths from the workspace file
+DIRS=$(python3 -c "
+import json, sys, os
+
+with open('$WORKSPACE_FILE') as f:
+    ws = json.load(f)
+
+ws_dir = os.path.dirname(os.path.abspath('$WORKSPACE_FILE'))
+
+for folder in ws.get('folders', []):
+    path = folder.get('path', '')
+    # Handle both relative and absolute paths
+    if not os.path.isabs(path):
+        path = os.path.join(ws_dir, path)
+    print(os.path.normpath(path))
+")
+
+# Build the --add-dir flags
+ADD_DIR_FLAGS=""
+FIRST_DIR=""
+
+while IFS= read -r dir; do
+  if [ -z "$FIRST_DIR" ]; then
+    FIRST_DIR="$dir"
+  else
+    ADD_DIR_FLAGS="$ADD_DIR_FLAGS --add-dir \"$dir\""
+  fi
+done <<< "$DIRS"
+
+echo "Primary dir: $FIRST_DIR"
+echo "Additional dirs: $ADD_DIR_FLAGS"
+
+# Launch Claude Code from first repo, adding the rest
+eval "cd \"$FIRST_DIR\" && claude $ADD_DIR_FLAGS"
