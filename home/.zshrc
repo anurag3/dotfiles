@@ -80,7 +80,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   aws
-  git
   terraform
   zsh-autosuggestions
   zsh-syntax-highlighting
@@ -137,9 +136,11 @@ function cursor {
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
+alias ll="ls -lath"
 alias zshconfig="cursor ~/.zshrc"
 alias cc="claude"
 alias cw="claude-workspace"
+alias plans="cursor ~/.claude/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"

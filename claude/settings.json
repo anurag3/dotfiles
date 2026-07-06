@@ -1,7 +1,8 @@
 {
   "env": {
     "DISABLE_TELEMETRY": "1",
-    "DISABLE_ERROR_REPORTING": "1"
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "attribution": {
     "commit": "",
@@ -37,7 +38,8 @@
       "Write(/Users/anurag.desai/.claude/plans/**)",
       "Write(~/.claude/plans/**)",
       "Edit(/Users/anurag.desai/.claude/plans/**)",
-      "Edit(~/.claude/plans/**)"
+      "Edit(~/.claude/plans/**)",
+      "Bash(defaults read *)"
     ],
     "additionalDirectories": [
       "~/.claude/plans/"
@@ -69,8 +71,7 @@
     "sync-workspace-repos@local": true,
     "commit-commands@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
-    "superpowers@claude-plugins-official": true,
-    "obsidian@obsidian-skills": true
+    "superpowers@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "local": {
@@ -86,6 +87,9 @@
       }
     }
   },
-  "effortLevel": "high",
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "autoCompactEnabled": true,
+  "autoScrollEnabled": true,
+  "feedbackSurveyRate": 0,
+  "spinnerTipsEnabled": false
 }

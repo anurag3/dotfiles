@@ -63,6 +63,9 @@ the PR looks small — subtle issues often hide in small changes.
 - Breaking changes to contracts (schema, API, file format, column names) with no migration plan
 - Functions or tasks doing too much — no clear single responsibility
 - **DE-specific traps:** timezone assumptions (naive datetime vs. UTC-aware, `data_interval_end` misuse), NULL semantics silently changing row counts in aggregations or joins, partition skew causing hotspots or OOM
+- **Airflow traps:** tasks with no `retries`/`retry_delay` on flaky operators, sensors left in default poke mode with no `timeout` (blocks a worker slot indefinitely), `execution_date` used instead of `data_interval_start`/`data_interval_end`, XCom used to pass bulk data instead of a pointer/reference
+- **dbt traps:** incremental models with no `unique_key` (or a merge strategy that still allows duplicates) causing row duplication on re-run, `{{ this }}` referenced without an incremental guard
+- **Spark traps:** driver-side `.collect()`/`.toPandas()` on data that won't reliably fit in driver memory, row-wise `.apply()`/Python UDFs used where a native or vectorized function would do
 
 ### 🔒 Security Issues
 
@@ -87,6 +90,9 @@ the PR looks small — subtle issues often hide in small changes.
 - **Cost at scale:** unbounded scans with no partition pruning, oversized clusters for the actual workload, small-file explosion amplifying S3/storage request costs — ask "what does this bill at 10x volume?"
 - **Operational readiness:** failure leaves data in a partial or inconsistent state with no safe re-trigger path; no documented recovery steps for likely failure modes; on-call burden increases with no mitigation
 - **Downstream contract impact:** output schema, column names, file paths, or partition structure consumed by other pipelines, models, or reports changed without auditing consumers — one-line changes cascade silently
+- **Medallion/layering violations:** raw or landing data written directly to a gold/serving table with no bronze/silver validation or dedup step in between; a mart model querying `source()` directly instead of going through a staging layer
+- **Databricks-specific:** Delta table written with `overwrite` where a `merge`/upsert was needed (destroys history on rerun), no `OPTIMIZE`/Z-ORDER or compaction plan for a table that will accumulate small files, schema evolution (Auto Loader/`mergeSchema`) not handled — schema drift breaks the pipeline silently
+- **Spark scale traps:** wide shuffle (join/groupBy) on skewed keys with no repartitioning, join against a small dimension table with no broadcast hint
 
 ---
 
@@ -151,6 +157,10 @@ Use this to calibrate — don't over-block on style, don't under-block on correc
 | Unbounded scan or missing partition pruning on a high-volume table | 🟡 Major |
 | Timezone or NULL handling bug that silently corrupts aggregates | 🟡 Major |
 | Cost will materially increase at scale with no justification | 🟡 Major |
+| Incremental model has no unique_key/merge strategy, duplicating rows on re-run | 🔴 Blocker |
+| Raw/landing data written straight to gold with no bronze/silver validation step | 🟡 Major |
+| Delta table overwritten where a merge/upsert was needed, destroying history | 🔴 Blocker |
+| Airflow sensor with no timeout, risking an indefinitely blocked worker slot | 🟡 Major |
 
 ---
 

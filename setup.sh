@@ -88,6 +88,7 @@ killall Finder 2>/dev/null || true
 # Dock
 defaults write com.apple.dock tilesize -int 36                           # Icon size: 36px
 defaults write com.apple.dock mineffect -string "scale"                  # Scale effect for minimize (faster than genie)
+defaults write com.apple.dock launchanim -bool false                     # Disable app launch bounce animation
 defaults write com.apple.dock minimize-to-application -bool true         # Minimize windows into their app icon
 defaults write com.apple.dock show-process-indicators -bool true         # Show dot indicators for open apps
 defaults write com.apple.dock autohide-delay -float 0                   # No delay before dock hides
@@ -98,6 +99,7 @@ defaults write com.apple.dock show-recents -bool false                   # Don't
 defaults write com.apple.dock magnification -bool true                   # Enable dock magnification on hover
 defaults write com.apple.dock mru-spaces -bool false                     # Don't rearrange Spaces based on recent use
 defaults write com.apple.dock expose-group-apps -bool false              # Mission Control: don't group windows by app
+defaults write com.apple.dock enterMissionControlByTopWindowDrag -bool false  # Don't enter Mission Control by dragging window to top
 dockutil --add ~/Downloads --view auto --display folder --sort dateadded --replacing Downloads 2>/dev/null || true
 killall Dock 2>/dev/null || true
 
