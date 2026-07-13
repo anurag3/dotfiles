@@ -3,13 +3,130 @@ set -e
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Ask for the administrator password upfront and keep the session alive
-sudo -v
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+# Ordered list of section keys, used for selection, help text, and execution order.
+SECTION_KEYS=(macos xcode brew git zsh dotfiles claude nvim vscode rectangle vorssaint spotlight iterm2 ghostty cursor statusline editor bun sublime textreplace)
+
+declare -A SECTION_DESC=(
+    [macos]="macOS defaults (keyboard, trackpad, Finder, Dock, etc.)"
+    [xcode]="Xcode CLI tools"
+    [brew]="Homebrew + Brewfile bundle"
+    [git]="Git config"
+    [zsh]="Oh My Zsh + plugins"
+    [dotfiles]="Dotfiles symlinks (.zshrc, .gitconfig, etc.)"
+    [claude]="Claude Code config symlinks"
+    [nvim]="Neovim config symlink"
+    [vscode]="VSCode settings"
+    [rectangle]="Rectangle settings import"
+    [vorssaint]="Vorssaint settings import"
+    [spotlight]="Spotlight search categories"
+    [iterm2]="iTerm2 preferences"
+    [ghostty]="Ghostty config"
+    [cursor]="Cursor settings + extensions"
+    [statusline]="Claude Code status line"
+    [editor]="Default editor (Cursor)"
+    [bun]="Bun install"
+    [sublime]="Sublime Text settings"
+    [textreplace]="Text replacements"
+)
+
+usage() {
+    echo "Usage: $0 [section...]"
+    echo
+    echo "Run with no arguments for an interactive selection menu, or list one or more"
+    echo "section names to run only those, skipping the menu:"
+    echo
+    for key in "${SECTION_KEYS[@]}"; do
+        printf "  %-12s %s\n" "$key" "${SECTION_DESC[$key]}"
+    done
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    usage
+    exit 0
+fi
+
+select_sections_interactively() {
+    declare -gA CHOSEN
+    local key choice choices
+    for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done
+
+    while true; do
+        clear
+        echo "Dotfiles Setup — select sections to run"
+        echo
+        local i=1
+        for key in "${SECTION_KEYS[@]}"; do
+            local mark=" "
+            [ "${CHOSEN[$key]}" = "1" ] && mark="x"
+            printf "  %2d) [%s] %-12s %s\n" "$i" "$mark" "$key" "${SECTION_DESC[$key]}"
+            i=$((i + 1))
+        done
+        echo
+        echo "Enter numbers to toggle (space-separated), 'a' = all, 'n' = none,"
+        echo "'q' = quit, or press Enter to run the checked sections."
+        read -rp "> " -a choices
+
+        [ "${#choices[@]}" -eq 0 ] && break
+
+        for choice in "${choices[@]}"; do
+            case "$choice" in
+                a|A) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done ;;
+                n|N) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=0; done ;;
+                q|Q) echo "Aborted."; exit 0 ;;
+                *)
+                    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#SECTION_KEYS[@]}" ]; then
+                        key="${SECTION_KEYS[$((choice - 1))]}"
+                        [ "${CHOSEN[$key]}" = "1" ] && CHOSEN[$key]=0 || CHOSEN[$key]=1
+                    else
+                        echo "Invalid selection: $choice" >&2
+                        sleep 1
+                    fi
+                    ;;
+            esac
+        done
+    done
+
+    SELECTED=()
+    for key in "${SECTION_KEYS[@]}"; do
+        [ "${CHOSEN[$key]}" = "1" ] && SELECTED+=("$key")
+    done
+
+    if [ "${#SELECTED[@]}" -eq 0 ]; then
+        echo "No sections selected — nothing to do."
+        exit 0
+    fi
+}
+
+if [ "$#" -eq 0 ]; then
+    if [ -t 0 ]; then
+        select_sections_interactively
+    else
+        SELECTED=("${SECTION_KEYS[@]}")
+    fi
+else
+    SELECTED=("$@")
+    for key in "${SELECTED[@]}"; do
+        if [ -z "${SECTION_DESC[$key]:-}" ]; then
+            echo "Unknown section: $key" >&2
+            echo >&2
+            usage >&2
+            exit 1
+        fi
+    done
+fi
+
+is_selected() {
+    local key="$1"
+    for s in "${SELECTED[@]}"; do
+        [ "$s" = "$key" ] && return 0
+    done
+    return 1
+}
 
 ###############################################################################
 # macOS Defaults                                                              #
 ###############################################################################
+section_macos() {
 echo "==> Applying macOS defaults..."
 
 # General
@@ -32,7 +149,7 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false  
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3         # Full keyboard access (Tab works in modal dialogs)
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false # Key repeat instead of press-and-hold accent picker
 defaults write NSGlobalDomain KeyRepeat -int 1                   # Fastest key repeat rate
-defaults write NSGlobalDomain InitialKeyRepeat -int 10           # Short delay before repeat starts
+defaults write NSGlobalDomain InitialKeyRepeat -int 10           # Shortest delay before repeat starts
 
 # Trackpad
 for domain in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothMultitouch.trackpad; do
@@ -109,16 +226,20 @@ defaults write com.apple.ActivityMonitor IconType -int 5                 # Show 
 defaults write com.apple.ActivityMonitor ShowCategory -int 0             # Show all processes (not just user's)
 defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"  # Sort by CPU usage
 defaults write com.apple.ActivityMonitor SortDirection -int 0            # Descending (highest CPU first)
+}
 
 ###############################################################################
 # Xcode CLI Tools                                                             #
 ###############################################################################
+section_xcode() {
 echo "==> Installing Xcode CLI tools..."
 xcode-select --install 2>/dev/null || true
+}
 
 ###############################################################################
 # Homebrew                                                                    #
 ###############################################################################
+section_brew() {
 echo "==> Installing Homebrew..."
 if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -129,20 +250,24 @@ fi
 echo "==> Running brew bundle..."
 brew bundle --file="$DOTFILES_DIR/Brewfile"
 brew cleanup
+}
 
 ###############################################################################
 # Git Config                                                                  #
 ###############################################################################
+section_git() {
 echo "==> Configuring git..."
 git config --global user.name "Anurag Desai"
 git config --global user.email "anurag.desai@hginsights.com"
 git config --global push.autoSetupRemote true
 git config --global url."git@github.com:".insteadOf "https://github.com/"  # Force SSH for GitHub (avoids HTTPS auth prompts for brew taps)
 git lfs install
+}
 
 ###############################################################################
 # Oh My Zsh + Plugins                                                         #
 ###############################################################################
+section_zsh() {
 echo "==> Installing Oh My Zsh..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -159,10 +284,12 @@ echo "==> Installing zsh plugins..."
     git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 [ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] || \
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+}
 
 ###############################################################################
 # Dotfiles                                                                    #
 ###############################################################################
+section_dotfiles() {
 echo "==> Symlinking dotfiles..."
 ln -sf "$DOTFILES_DIR/home/.zshrc"     "$HOME/.zshrc"
 ln -sf "$DOTFILES_DIR/home/.gitconfig" "$HOME/.gitconfig"
@@ -171,10 +298,12 @@ ln -sf "$DOTFILES_DIR/home/.p10k.zsh"  "$HOME/.p10k.zsh"
 
 mkdir -p "$HOME/.local/bin"
 ln -sf "$DOTFILES_DIR/home/.local/bin/claude-workspace" "$HOME/.local/bin/claude-workspace"
+}
 
 ###############################################################################
 # Claude Code Config                                                          #
 ###############################################################################
+section_claude() {
 echo "==> Symlinking Claude config..."
 mkdir -p "$HOME/.claude"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md"             "$HOME/.claude/CLAUDE.md"
@@ -187,18 +316,22 @@ ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-co
 [ -d "$DOTFILES_DIR/claude/skills" ] && \
     rm -rf "$HOME/.claude/skills" && \
     ln -sf "$DOTFILES_DIR/claude/skills"  "$HOME/.claude/skills"
+}
 
 ###############################################################################
 # Neovim Config                                                               #
 ###############################################################################
+section_nvim() {
 echo "==> Symlinking Neovim config..."
 mkdir -p "$HOME/.config"
 rm -rf "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+}
 
 ###############################################################################
 # VSCode Settings                                                             #
 ###############################################################################
+section_vscode() {
 echo "==> Symlinking VSCode settings..."
 VSCODE_USER="$HOME/Library/Application Support/Code/User"
 mkdir -p "$VSCODE_USER"
@@ -207,22 +340,28 @@ ln -sf "$DOTFILES_DIR/vscode/settings.json"    "$VSCODE_USER/settings.json"
     ln -sf "$DOTFILES_DIR/vscode/keybindings.json" "$VSCODE_USER/keybindings.json"
 [ -d "$DOTFILES_DIR/vscode/snippets" ] && \
     ln -sf "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER/snippets"
+}
 
 ###############################################################################
 # Rectangle                                                                   #
 ###############################################################################
+section_rectangle() {
 echo "==> Importing Rectangle settings..."
 defaults import com.knollsoft.Rectangle "$DOTFILES_DIR/rectangle/com.knollsoft.Rectangle.plist"
+}
 
 ###############################################################################
 # Vorssaint                                                                   #
 ###############################################################################
+section_vorssaint() {
 echo "==> Importing Vorssaint settings..."
 defaults import com.vorssaint.utils "$DOTFILES_DIR/vorssaint/com.vorssaint.utils.plist"
+}
 
 ###############################################################################
 # Spotlight                                                                   #
 ###############################################################################
+section_spotlight() {
 # To reset Spotlight to defaults: defaults delete com.apple.Spotlight orderedItems && sudo killall mds
 echo "==> Setting Spotlight search categories..."
 defaults write com.apple.Spotlight orderedItems -array \
@@ -250,26 +389,32 @@ defaults write com.apple.Spotlight orderedItems -array \
   '{ enabled = 0; name = BOOKMARKS; }'
 sudo killall mds 2>/dev/null || true
 killall Spotlight 2>/dev/null || true
+}
 
 ###############################################################################
 # iTerm2 Prefs                                                                #
 ###############################################################################
+section_iterm2() {
 echo "==> Configuring iTerm2 preferences..."
 defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm2"
 defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 # iTerm2 already writes directly to the PrefsCustomFolder — no symlink needed
+}
 
 ###############################################################################
 # Ghostty Config                                                              #
 ###############################################################################
+section_ghostty() {
 echo "==> Symlinking Ghostty config..."
 GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
 mkdir -p "$GHOSTTY_DIR"
 ln -sf "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
+}
 
 ###############################################################################
 # Cursor Settings                                                             #
 ###############################################################################
+section_cursor() {
 echo "==> Symlinking Cursor settings..."
 CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
 mkdir -p "$CURSOR_USER"
@@ -285,10 +430,12 @@ if command -v cursor &>/dev/null; then
 else
     echo "    Cursor CLI not found — install extensions manually or re-run after opening Cursor once."
 fi
+}
 
 ###############################################################################
 # Claude Code Status Line                                                     #
 ###############################################################################
+section_statusline() {
 echo "==> Configuring Claude Code status line..."
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 mkdir -p "$HOME/.claude"
@@ -304,10 +451,12 @@ with open('$CLAUDE_SETTINGS', 'w') as f:
 else
     echo '{"statusLine":{"type":"command","command":"bunx -y ccstatusline@latest","padding":0,"refreshInterval":1}}' > "$CLAUDE_SETTINGS"
 fi
+}
 
 ###############################################################################
 # Default Editor (Cursor)                                                     #
 ###############################################################################
+section_editor() {
 echo "==> Setting Cursor as default text editor..."
 CURSOR_BUNDLE_ID=$(osascript -e 'id of app "Cursor"' 2>/dev/null)
 if [ -z "$CURSOR_BUNDLE_ID" ]; then
@@ -321,16 +470,20 @@ else
     duti -s "$CURSOR_BUNDLE_ID" public.xml all             # XML files
     duti -s "$CURSOR_BUNDLE_ID" public.yaml all            # YAML files
 fi
+}
 
 ###############################################################################
 # Bun                                                                         #
 ###############################################################################
+section_bun() {
 echo "==> Installing Bun..."
 [ -d "$HOME/.bun" ] || curl -fsSL https://bun.sh/install | bash
+}
 
 ###############################################################################
 # Sublime Text Settings                                                       #
 ###############################################################################
+section_sublime() {
 echo "==> Symlinking Sublime Text settings..."
 ST_USER="$HOME/Library/Application Support/Sublime Text/Packages/User"
 if [ -d "$ST_USER" ]; then
@@ -340,10 +493,12 @@ if [ -d "$ST_USER" ]; then
 else
     echo "    Sublime Text not found — open it once to create the User dir, then re-run."
 fi
+}
 
 ###############################################################################
 # Text Replacements                                                           #
 ###############################################################################
+section_textreplace() {
 echo "==> Setting text replacements..."
 defaults write -g NSUserReplacementItems -array \
   '{ replace = "->"; with = "\U2192"; }' \
@@ -358,6 +513,18 @@ defaults write -g NSUserReplacementItems -array \
   '{ replace = "tixs"; with = "tickets"; }' \
   '{ replace = "txn"; with = "transaction"; }' \
   '{ replace = "txns"; with = "transactions"; }'
+}
+
+# Ask for the administrator password upfront (only if a selected section needs
+# it) and keep the session alive so nothing prompts for it again mid-run.
+if is_selected macos || is_selected spotlight; then
+    sudo -v
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+fi
+
+for key in "${SELECTED[@]}"; do
+    "section_$key"
+done
 
 echo ""
 echo "✓ Setup complete."
