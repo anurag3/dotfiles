@@ -47,44 +47,55 @@ fi
 
 select_sections_interactively() {
     declare -gA CHOSEN
-    local key choice choices
+    local key cursor=0 key_count="${#SECTION_KEYS[@]}"
     for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done
+
+    local old_stty
+    old_stty=$(stty -g)
+    stty -echo -icanon
+    trap 'stty "$old_stty"' EXIT
 
     while true; do
         clear
         echo "Dotfiles Setup — select sections to run"
         echo
-        local i=1
+        local i=0
         for key in "${SECTION_KEYS[@]}"; do
-            local mark=" "
+            local mark=" " pointer=" "
             [ "${CHOSEN[$key]}" = "1" ] && mark="x"
-            printf "  %2d) [%s] %-12s %s\n" "$i" "$mark" "$key" "${SECTION_DESC[$key]}"
+            [ "$i" -eq "$cursor" ] && pointer=">"
+            printf "%s [%s] %-12s %s\n" "$pointer" "$mark" "$key" "${SECTION_DESC[$key]}"
             i=$((i + 1))
         done
         echo
-        echo "Enter numbers to toggle (space-separated), 'a' = all, 'n' = none,"
-        echo "'q' = quit, or press Enter to run the checked sections."
-        read -rp "> " -a choices
+        echo "↑/k ↓/j move   space toggle   a all   n none   q quit   enter run"
 
-        [ "${#choices[@]}" -eq 0 ] && break
+        local keypress rest
+        IFS= read -rsn1 keypress
+        if [ "$keypress" = $'\x1b' ]; then
+            IFS= read -rsn2 -t 0.01 rest
+            keypress+="$rest"
+        fi
 
-        for choice in "${choices[@]}"; do
-            case "$choice" in
-                a|A) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done ;;
-                n|N) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=0; done ;;
-                q|Q) echo "Aborted."; exit 0 ;;
-                *)
-                    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#SECTION_KEYS[@]}" ]; then
-                        key="${SECTION_KEYS[$((choice - 1))]}"
-                        [ "${CHOSEN[$key]}" = "1" ] && CHOSEN[$key]=0 || CHOSEN[$key]=1
-                    else
-                        echo "Invalid selection: $choice" >&2
-                        sleep 1
-                    fi
-                    ;;
-            esac
-        done
+        case "$keypress" in
+            $'\x1b[A'|k|K) [ "$cursor" -gt 0 ] && cursor=$((cursor - 1)) ;;
+            $'\x1b[B'|j|J) [ "$cursor" -lt $((key_count - 1)) ] && cursor=$((cursor + 1)) ;;
+            ' ')
+                key="${SECTION_KEYS[$cursor]}"
+                [ "${CHOSEN[$key]}" = "1" ] && CHOSEN[$key]=0 || CHOSEN[$key]=1
+                ;;
+            a|A) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done ;;
+            n|N) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=0; done ;;
+            q|Q)
+                echo "Aborted."
+                exit 0
+                ;;
+            "") break ;;
+        esac
     done
+
+    stty "$old_stty"
+    trap - EXIT
 
     SELECTED=()
     for key in "${SECTION_KEYS[@]}"; do
