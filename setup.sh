@@ -73,7 +73,7 @@ select_sections_interactively() {
         local keypress rest
         IFS= read -rsn1 keypress
         if [ "$keypress" = $'\x1b' ]; then
-            IFS= read -rsn2 -t 0.01 rest
+            IFS= read -rsn2 -t 0.05 rest || true
             keypress+="$rest"
         fi
 
