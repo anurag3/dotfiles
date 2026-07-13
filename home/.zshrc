@@ -95,18 +95,18 @@ timezsh() {
   for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
-# jar_upload(){
-#   sbt clean && sbt assembly
-#   echo "sbt Done"
-#   aws s3 cp target/scala-2.12/datagate-file-publisher.jar s3://hg-testing-code/datagate-file-publisher.jar
-#   echo "Jar cp Done"
-#   aws lambda update-function-code --function-name arn:aws:lambda:us-west-2:389057546498:function:datagate-dev-file-publisher --s3-bucket hg-testing-code --s3-key datagate-file-publisher.jar
-#   echo "Lambda update Done"
-#   aws s3 rm s3://hg-tests/test.txt
-#   echo "txt rm Done"
-#   aws s3 cp ~/Downloads/test.txt s3://hg-tests/
-#   echo "txt cp Done"
-# }
+jar_upload(){
+  sbt clean && sbt assembly
+  echo "sbt Done"
+  aws s3 cp target/scala-2.12/datagate-file-publisher.jar s3://hg-testing-code/datagate-file-publisher.jar
+  echo "Jar cp Done"
+  aws lambda update-function-code --function-name arn:aws:lambda:us-west-2:389057546498:function:datagate-dev-file-publisher --s3-bucket hg-testing-code --s3-key datagate-file-publisher.jar
+  echo "Lambda update Done"
+  aws s3 rm s3://hg-tests/test.txt
+  echo "txt rm Done"
+  aws s3 cp ~/Downloads/test.txt s3://hg-tests/
+  echo "txt cp Done"
+}
 
 function cursor {
   open -a "/Applications/Cursor.app" "$@"
@@ -140,6 +140,7 @@ alias ll="ls -lath"
 alias zshconfig="cursor ~/.zshrc"
 alias cc="claude"
 alias cw="claude-workspace"
+alias cx="cursor ."
 alias plans="cursor ~/.claude/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 

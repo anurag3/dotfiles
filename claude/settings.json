@@ -68,18 +68,11 @@
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": false,
-    "sync-workspace-repos@local": true,
     "commit-commands@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
-    "local": {
-      "source": {
-        "source": "directory",
-        "path": "/Users/anurag.desai/.claude/local-skills"
-      }
-    },
     "obsidian-skills": {
       "source": {
         "source": "github",
@@ -91,5 +84,5 @@
   "autoCompactEnabled": true,
   "autoScrollEnabled": true,
   "feedbackSurveyRate": 0,
-  "spinnerTipsEnabled": false
+  "spinnerTipsEnabled": true
 }
