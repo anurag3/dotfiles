@@ -1,28 +1,26 @@
 ---
 name: sam-review
 description: >
-  Review pull requests through the lens of a Principal Data Engineer. Covers
-  pain points, security vulnerabilities, and architectural risks specific to
-  data systems — pipelines, transformations, queries, schemas, and platform
-  code. Use this skill whenever someone pastes a diff, shares a PR URL, or
-  asks for a code review on anything touching data ingestion, ELT/ETL,
-  dbt models, Spark jobs, Airflow DAGs, SQL, streaming pipelines, schema
-  migrations, or data platform infrastructure. Also trigger when the user
-  says "review this PR", "is this safe to merge", "check my pipeline code",
-  "look at this DAG", or "review my dbt model". Do not wait for the user to
-  say "data engineering" explicitly — if the code handles data movement,
-  transformation, or storage, use this skill.
+  Use when reviewing a pull request, diff, or code change — data pipelines
+  (ETL/ELT, dbt, Spark, Airflow, SQL, schema migrations), infrastructure
+  (Terraform, Helm, Kubernetes, CI/CD), ML (training, serving, feature
+  engineering), or general backend/API code. Trigger on "review this PR",
+  "is this safe to merge", "check my pipeline/infra/service code", "look at
+  this DAG/Terraform module", or any diff touching data movement, infra
+  provisioning, model training, or application logic — not just when the
+  user says "data engineering".
 ---
 
-# Data Engineering PR Review
+# PR Review
 
-Review pull requests as a Principal Data Engineer — direct, thorough, and
-willing to block a merge when something is genuinely wrong.
+Review as a Principal Engineer: direct, thorough, and willing to block a
+merge when something is genuinely wrong. Explain **why** something is a
+problem, not just that it is one — and call out what's done well.
 
 ## Usage
 
 ```
-/de-pr-review <paste diff, describe changes, or provide PR URL>
+/sam-review <paste diff, describe changes, or provide PR URL>
 ```
 
 Provide the diff or change description where indicated. If no diff is given,
@@ -30,21 +28,20 @@ ask for it before proceeding.
 
 ---
 
-## Reviewer Persona
+## Domain Routing
 
-You have 10+ years building large-scale data systems. Your expertise spans:
+Identify which domain(s) the diff touches, then read the matching reference
+file(s) below before reviewing. A diff can span more than one domain (e.g. a
+Helm chart deploying a Spark job) — read all that apply.
 
-- **Pipelines**: batch, streaming, CDC, ELT/ETL patterns
-- **Query optimization**: SQL, columnar stores, partitioning, indexing
-- **Distributed systems**: Spark, Kafka, Flink, Airflow, dbt
-- **Data modeling**: Kimball, Data Vault, One Big Table
-- **Cloud platforms**: Snowflake, BigQuery, Redshift, Databricks
-- **Security & compliance**: PII handling, GDPR, SOC2 controls
-- **Engineering fundamentals**: testing, CI/CD, observability, SLAs
+| Diff touches | Reference file |
+|---|---|
+| Pipelines, ETL/ELT, dbt, Spark, Airflow, SQL, schema/warehouse changes, or ML training/serving/feature code | `references/data-engineering.md` |
+| Terraform, Helm, Kubernetes manifests, CI/CD config, cloud provisioning | `references/devops-infra.md` |
+| Application/API/service code | `references/backend-software-engineering.md` |
 
-Call out problems bluntly but constructively. Always explain **why** something
-is a problem, not just that it is one. Highlight what's done well — good
-engineering deserves acknowledgment.
+Layer the domain-specific traps from those file(s) onto the core checklist
+below.
 
 ---
 
@@ -57,42 +54,33 @@ the PR looks small — subtle issues often hide in small changes.
 
 - Logic errors, off-by-one mistakes, silent failures
 - Missing error handling or no retry logic on flaky operations
-- Hardcoded values that should be config- or environment-driven
+- Hardcoded values that should be config- or environment-driven (12-Factor config)
 - Missing, misleading, or excessively noisy logging
 - Tests that are absent, trivial, or structured in a way that can't catch regressions
 - Breaking changes to contracts (schema, API, file format, column names) with no migration plan
-- Functions or tasks doing too much — no clear single responsibility
-- **DE-specific traps:** timezone assumptions (naive datetime vs. UTC-aware, `data_interval_end` misuse), NULL semantics silently changing row counts in aggregations or joins, partition skew causing hotspots or OOM
-- **Airflow traps:** tasks with no `retries`/`retry_delay` on flaky operators, sensors left in default poke mode with no `timeout` (blocks a worker slot indefinitely), `execution_date` used instead of `data_interval_start`/`data_interval_end`, XCom used to pass bulk data instead of a pointer/reference
-- **dbt traps:** incremental models with no `unique_key` (or a merge strategy that still allows duplicates) causing row duplication on re-run, `{{ this }}` referenced without an incremental guard
-- **Spark traps:** driver-side `.collect()`/`.toPandas()` on data that won't reliably fit in driver memory, row-wise `.apply()`/Python UDFs used where a native or vectorized function would do
+- Functions or tasks doing too much — no clear single responsibility (SRP)
+- **Speculative generality** *(🟢 Minor)*: config knobs, flags, or abstraction layers built for a hypothetical future need with no current caller (YAGNI)
+- **Needless complexity** *(🟢 Minor; 🟡 Major if it obscures a correctness issue)*: extra layers, indirection, or cleverness for a problem a simpler approach would solve (KISS)
+- **Duplicated logic** *(🟢 Minor; 🟡 Major if copies have already drifted)*: copy-pasted blocks that should be one shared implementation (DRY)
 
 ### 🔒 Security Issues
 
-- SQL injection or string-interpolated queries instead of parameterized ones
+- SQL injection or string-interpolated queries instead of parameterized ones (OWASP injection prevention)
 - Credentials, API keys, tokens, or secrets hardcoded or committed to the repo
 - PII written to logs, error messages, or unencrypted/unmasked storage
-- Overly permissive IAM roles, service accounts, or database grants
+- Overly permissive IAM roles, service accounts, or database grants (Principle of Least Privilege)
 - Unvalidated or unsanitized inputs passed into downstream queries or systems
 - Insecure connections — plain HTTP, skipped TLS verification, unencrypted transport
 - Data leakage risk across tenant boundaries or between environments (prod/staging bleed)
 
 ### 🏗️ Architectural Issues
 
-- Pipeline tightly coupled to a specific source system, schema version, or tool with no abstraction
-- Missing idempotency — re-running the job produces duplicates or inconsistent results
-- No backfill strategy or late-arrival handling for event-time or time-series data
+- Component tightly coupled to a specific external system, schema/API version, or tool with no abstraction layer (Dependency Inversion)
+- Missing idempotency — re-running the operation produces duplicates or inconsistent results (Idempotent Receiver)
 - Unbounded queries, scans, or loops that will silently degrade or fail at scale
 - Blocking synchronous operations where async or parallel processing is warranted
-- Schema drift not handled — code assumes a fixed structure with no validation or contract test
-- No data quality checks or assertions at key transformation or load steps
-- Observability gaps — no lineage tracking, no row-count or freshness metrics, no alerting hooks
-- **Cost at scale:** unbounded scans with no partition pruning, oversized clusters for the actual workload, small-file explosion amplifying S3/storage request costs — ask "what does this bill at 10x volume?"
-- **Operational readiness:** failure leaves data in a partial or inconsistent state with no safe re-trigger path; no documented recovery steps for likely failure modes; on-call burden increases with no mitigation
-- **Downstream contract impact:** output schema, column names, file paths, or partition structure consumed by other pipelines, models, or reports changed without auditing consumers — one-line changes cascade silently
-- **Medallion/layering violations:** raw or landing data written directly to a gold/serving table with no bronze/silver validation or dedup step in between; a mart model querying `source()` directly instead of going through a staging layer
-- **Databricks-specific:** Delta table written with `overwrite` where a `merge`/upsert was needed (destroys history on rerun), no `OPTIMIZE`/Z-ORDER or compaction plan for a table that will accumulate small files, schema evolution (Auto Loader/`mergeSchema`) not handled — schema drift breaks the pipeline silently
-- **Spark scale traps:** wide shuffle (join/groupBy) on skewed keys with no repartitioning, join against a small dimension table with no broadcast hint
+- Schema/contract drift not handled — code assumes a fixed structure with no validation or contract test
+- Observability gaps — no metrics, logs, or alerting hooks for a component expected to run unattended
 
 ---
 
@@ -152,25 +140,17 @@ Use this to calibrate — don't over-block on style, don't under-block on correc
 | Inconsistent naming or minor style deviation | 🟢 Minor |
 | Logging that could be improved but isn't misleading | 🟢 Minor |
 | Minor inefficiency in a non-hot path | 🟢 Minor |
-| Failure leaves data in partial/inconsistent state with no recovery path | 🔴 Blocker |
-| Downstream consumer of output schema/path not audited before change | 🟡 Major |
-| Unbounded scan or missing partition pruning on a high-volume table | 🟡 Major |
-| Timezone or NULL handling bug that silently corrupts aggregates | 🟡 Major |
-| Cost will materially increase at scale with no justification | 🟡 Major |
-| Incremental model has no unique_key/merge strategy, duplicating rows on re-run | 🔴 Blocker |
-| Raw/landing data written straight to gold with no bronze/silver validation step | 🟡 Major |
-| Delta table overwritten where a merge/upsert was needed, destroying history | 🔴 Blocker |
-| Airflow sensor with no timeout, risking an indefinitely blocked worker slot | 🟡 Major |
+
+Domain-specific severities (Airflow, dbt, Spark, Terraform, Helm, ML, etc.)
+are tagged inline on their checklist bullets in the reference files.
 
 ---
 
 ## Tips for Better Reviews
 
-- **Add context in your request.** "This is a hot path running every 2 minutes" or
-  "This table contains PII" lets the reviewer focus on what matters most.
-- **Include the tests.** If you paste the tests alongside the diff, the review covers
-  test quality too.
-- **Specify what you're unsure about.** "I'm not sure this handles late arrivals" is
-  a useful hint that will get you a sharper answer.
-- **For dbt models**, include the schema.yml and any upstream ref() models if the
-  issue might be relational.
+- **Add context**: hot-path frequency, PII sensitivity, or what you're unsure
+  about (e.g. "not sure this handles late arrivals") sharpens the review.
+- **Include tests** alongside the diff to get test-quality coverage too.
+- **For domain-specific reviews**, include what unlocks deeper context: dbt →
+  `schema.yml` + upstream `ref()` models; Terraform → the affected
+  `variables.tf`/state backend; ML → training config and eval metrics.
