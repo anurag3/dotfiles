@@ -94,5 +94,6 @@
         "**/.forgejo/workflows/*.yml",
         "**/.forgejo/workflows/*.yaml"
     ],
-    "editor.minimap.enabled": true
+    "editor.minimap.enabled": true,
+    "git.openRepositoryInParentFolders": "always"
 }

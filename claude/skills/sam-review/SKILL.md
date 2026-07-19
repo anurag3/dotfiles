@@ -1,53 +1,108 @@
 ---
 name: sam-review
 description: >
-  Use when reviewing a pull request, diff, or code change — data pipelines
-  (ETL/ELT, dbt, Spark, Airflow, SQL, schema migrations), infrastructure
-  (Terraform, Helm, Kubernetes, CI/CD), ML (training, serving, feature
-  engineering), or general backend/API code. Trigger on "review this PR",
-  "is this safe to merge", "check my pipeline/infra/service code", "look at
-  this DAG/Terraform module", or any diff touching data movement, infra
-  provisioning, model training, or application logic — not just when the
-  user says "data engineering".
+  Use when the user asks to review a pull request AND supplies a PR URL
+  (e.g. "review this PR <link>", "is this PR safe to merge <link>") —
+  covers data pipelines (ETL/ELT, dbt, Spark, Airflow, SQL, schema
+  migrations), infrastructure (Terraform, Helm, Kubernetes, CI/CD), ML, and
+  backend/API code. Requires an explicit PR link in the request.
 ---
 
 # PR Review
 
-Review as a Principal Engineer: direct, thorough, and willing to block a
-merge when something is genuinely wrong. Explain **why** something is a
+Review as a Principal Engineer: direct, thorough, and willing to block a  
+merge when something is genuinely wrong. Explain **why** something is a  
 problem, not just that it is one — and call out what's done well.
 
 ## Usage
 
 ```
-/sam-review <paste diff, describe changes, or provide PR URL>
+review this PR <PR URL>
 ```
 
-Provide the diff or change description where indicated. If no diff is given,
-ask for it before proceeding.
+Fetch the diff yourself once you have the link (works from any directory —  
+`gh` resolves the repo from the URL):
+
+```bash
+gh pr view <PR URL> --json title,body,files,additions,deletions,commits
+gh pr diff <PR URL> --patch > /tmp/pr<number>.diff
+```
 
 ---
 
 ## Domain Routing
 
-Identify which domain(s) the diff touches, then read the matching reference
-file(s) below before reviewing. A diff can span more than one domain (e.g. a
+Identify which domain(s) the diff touches, then read the matching reference  
+file(s) below before reviewing. A diff can span more than one domain (e.g. a  
 Helm chart deploying a Spark job) — read all that apply.
 
-| Diff touches | Reference file |
-|---|---|
-| Pipelines, ETL/ELT, dbt, Spark, Airflow, SQL, schema/warehouse changes, or ML training/serving/feature code | `references/data-engineering.md` |
-| Terraform, Helm, Kubernetes manifests, CI/CD config, cloud provisioning | `references/devops-infra.md` |
-| Application/API/service code | `references/backend-software-engineering.md` |
+| Diff touches                                                                                                | Reference file                               |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Pipelines, ETL/ELT, dbt, Spark, Airflow, SQL, schema/warehouse changes, or ML training/serving/feature code | `references/data-engineering.md`             |
+| Terraform, Helm, Kubernetes manifests, CI/CD config, cloud provisioning                                     | `references/devops-infra.md`                 |
+| Application/API/service code                                                                                | `references/backend-software-engineering.md` |
 
-Layer the domain-specific traps from those file(s) onto the core checklist
+Layer the domain-specific traps from those file(s) onto the core checklist  
 below.
+
+---
+
+## Large PR Fan-Out Protocol
+
+For a small/medium diff, review it directly — do not spawn sub-agents.
+
+Fan out only when a single pass would blur attention across unrelated  
+components (rule of thumb: >500 changed lines, or files spanning more than  
+two domains/components from the Domain Routing table).
+
+1. **Split by component, not by line count.** Group changed files into
+  coherent slices (e.g. "CI/CD + deploy config", "core resolver logic",  
+   "new utils package + its tests") — each slice should be reviewable on  
+   its own without missing shared context. Write each slice to its own  
+   diff file (`/tmp/pr<number>_<slice>.diff`). This grouping is  
+   pattern-matching against the Domain Routing table — do it yourself, it  
+   doesn't need a model call.
+2. **Dispatch one `pr-slice-reviewer` sub-agent per slice, in parallel** —
+  not `general-purpose`. It's scoped to read only the diff file it's  
+   given (no `git diff`/`git show`/local-checkout access), which avoids a  
+   failure mode general-purpose agents hit: reading the local checkout  
+   instead of the PR branch and reporting findings that don't exist on the  
+   branch. Give each agent:
+  - The path to its diff file.
+  - The path to the relevant `references/<domain>.md` file(s) — point at  
+  the file, don't paste the checklist inline.
+  - Nothing else; its system prompt already has the core checklist and  
+  output format baked in.
+3. **Reconcile before consolidating** — do not just concatenate sub-agent
+  outputs into the final report:
+  - Re-verify every 🔴/🟡 finding against the actual diff text yourself  
+  before including it. A sub-agent flagging something you're not fully  
+  sure of is a signal to check, not a fact to pass through.
+  - Check for cross-slice issues no single slice-scoped agent could see:  
+  a shared module changed in one slice and consumed in another, a  
+  schema/contract produced in one slice and read in another, logic  
+  duplicated across slices.
+  - Deduplicate findings raised by more than one slice.
+  - Emit exactly one consolidated report in the Output Format below —  
+  never return the per-slice tables as-is.
+
+### Model & cost guidance
+
+- Splitting the diff into slices (step 1) is pattern-matching, not  
+judgment — do it directly rather than spending a model call on it.
+- Section reviews (step 2) need the same reasoning tier as the main  
+review. Missing a subtle correctness/security/architecture issue costs  
+far more (a bad merge, or rework re-reviewing) than a smaller model  
+saves in tokens — don't downgrade these.
+- The reconciliation step (step 3) is where cross-slice issues and  
+sub-agent misreads get caught — keep it on the main review thread, not  
+delegated to another agent.
 
 ---
 
 ## Review Checklist
 
-Work through all three areas for every review. Do not skip a category because
+Work through all three areas for every review. Do not skip a category because  
 the PR looks small — subtle issues often hide in small changes.
 
 ### 🔴 Pain Points (Obvious Issues)
@@ -86,7 +141,7 @@ the PR looks small — subtle issues often hide in small changes.
 
 ## Output Format
 
-Produce the review in this exact structure. Do not omit any section, even if
+Produce the review in this exact structure. Do not omit any section, even if  
 it has no findings — use "No issues found." in that case.
 
 ```markdown
@@ -127,30 +182,30 @@ name the open question that must be resolved first.]
 
 Use this to calibrate — don't over-block on style, don't under-block on correctness.
 
-| Condition | Severity |
-|-----------|----------|
-| Could cause data loss, duplication, or silent corruption | 🔴 Blocker |
+| Condition                                                            | Severity   |
+| -------------------------------------------------------------------- | ---------- |
+| Could cause data loss, duplication, or silent corruption             | 🔴 Blocker |
 | Exposes credentials, PII, or creates an exploitable injection vector | 🔴 Blocker |
-| Breaks an existing contract with no migration path | 🔴 Blocker |
-| No error handling on a critical path that will eventually fail | 🟡 Major |
-| Missing idempotency on a job that will be retried or backfilled | 🟡 Major |
-| Hardcoded environment values that block multi-env deployment | 🟡 Major |
-| No tests on non-trivial transformation logic | 🟡 Major |
-| Observability gap on a new pipeline with no existing monitoring | 🟡 Major |
-| Inconsistent naming or minor style deviation | 🟢 Minor |
-| Logging that could be improved but isn't misleading | 🟢 Minor |
-| Minor inefficiency in a non-hot path | 🟢 Minor |
+| Breaks an existing contract with no migration path                   | 🔴 Blocker |
+| No error handling on a critical path that will eventually fail       | 🟡 Major   |
+| Missing idempotency on a job that will be retried or backfilled      | 🟡 Major   |
+| Hardcoded environment values that block multi-env deployment         | 🟡 Major   |
+| No tests on non-trivial transformation logic                         | 🟡 Major   |
+| Observability gap on a new pipeline with no existing monitoring      | 🟡 Major   |
+| Inconsistent naming or minor style deviation                         | 🟢 Minor   |
+| Logging that could be improved but isn't misleading                  | 🟢 Minor   |
+| Minor inefficiency in a non-hot path                                 | 🟢 Minor   |
 
-Domain-specific severities (Airflow, dbt, Spark, Terraform, Helm, ML, etc.)
+Domain-specific severities (Airflow, dbt, Spark, Terraform, Helm, ML, etc.)  
 are tagged inline on their checklist bullets in the reference files.
 
 ---
 
 ## Tips for Better Reviews
 
-- **Add context**: hot-path frequency, PII sensitivity, or what you're unsure
-  about (e.g. "not sure this handles late arrivals") sharpens the review.
+- **Add context**: hot-path frequency, PII sensitivity, or what you're unsure  
+about (e.g. "not sure this handles late arrivals") sharpens the review.
 - **Include tests** alongside the diff to get test-quality coverage too.
-- **For domain-specific reviews**, include what unlocks deeper context: dbt →
-  `schema.yml` + upstream `ref()` models; Terraform → the affected
-  `variables.tf`/state backend; ML → training config and eval metrics.
+- **For domain-specific reviews**, include what unlocks deeper context: dbt →  
+`schema.yml` + upstream `ref()` models; Terraform → the affected  
+`variables.tf`/state backend; ML → training config and eval metrics.
