@@ -496,8 +496,15 @@ echo "==> Installing Bun..."
 ###############################################################################
 section_sublime() {
 echo "==> Symlinking Sublime Text settings..."
+ST_INSTALLED="$HOME/Library/Application Support/Sublime Text/Installed Packages"
 ST_USER="$HOME/Library/Application Support/Sublime Text/Packages/User"
 if [ -d "$ST_USER" ]; then
+    if [ ! -f "$ST_INSTALLED/Package Control.sublime-package" ]; then
+        echo "    Installing Package Control loader..."
+        mkdir -p "$ST_INSTALLED"
+        curl -fsSL "https://packagecontrol.io/Package%20Control.sublime-package" \
+            -o "$ST_INSTALLED/Package Control.sublime-package"
+    fi
     ln -sf "$DOTFILES_DIR/sublime-text/Preferences.sublime-settings" "$ST_USER/Preferences.sublime-settings"
     ln -sf "$DOTFILES_DIR/sublime-text/Package Control.sublime-settings" "$ST_USER/Package Control.sublime-settings"
     echo "    Symlinks created. Packages auto-install on next ST launch."
