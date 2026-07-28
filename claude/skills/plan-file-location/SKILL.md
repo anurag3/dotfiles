@@ -1,11 +1,13 @@
 ---
 name: plan-file-location
-description: Use before writing any plan file — triggered by entering plan mode (EnterPlanMode), by the superpowers:writing-plans skill, or by any user request to write/create/draft a plan. Defines the required file path and naming convention, overriding any harness-suggested path. Invoke this FIRST, before writing plan content anywhere.
+description: Use before writing any plan file — triggered by entering plan mode (EnterPlanMode), by plan mode already being active (even with no EnterPlanMode tool call, e.g. toggled via UI/Shift+Tab at session start), by the superpowers:writing-plans skill, or by any user request to write/create/draft a plan (phrases like "make a plan", "I want a plan"). Defines the required file path and naming convention, overriding any harness-suggested path. Invoke this FIRST, before writing plan content anywhere — never call Write for a plan file without invoking this skill first, regardless of how plan mode was entered.
 ---
 
 # Plan File Location
 
-**Every planning phase — whether triggered by the `superpowers:writing-plans` skill, the `EnterPlanMode` tool, or any user request to write/create/draft a plan — MUST store plan files in this exact path. No exceptions.**
+**Every planning phase — whether triggered by the `superpowers:writing-plans` skill, the `EnterPlanMode` tool, plan mode already being active, or any user request to write/create/draft a plan — MUST store plan files in this exact path. No exceptions.**
+
+**Do not rely on an `EnterPlanMode` tool-call event as the trigger.** In practice, plan mode is frequently already active when a message arrives (toggled via the CLI UI before the turn even starts), so there is no tool call to react to. The real trigger is *intent to write a plan file* — if the user's message asks for a plan (e.g. "I want to make a plan to..."), or you are about to call `Write`/`ExitPlanMode` with plan content, invoke this skill first. Do this even if you're mid-research and haven't consciously "entered" a planning phase.
 
 ```
 ~/.claude/plans/<repo>/<YYYY-MM-DD>-<plan_description>/
