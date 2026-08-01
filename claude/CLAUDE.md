@@ -78,3 +78,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 **Default to subagent-driven development (`superpowers:subagent-driven-development`) for executing plans. Do not ask which execution approach to use — just proceed with it.**
 
 This overrides the "Execution Handoff" step in the `superpowers:writing-plans` skill (which asks the user to choose between subagent-driven and inline execution). Only deviate from subagent-driven development if the user explicitly asks for inline execution or another approach for a given task.
+
+# Worktree Policy
+
+**Never create git worktrees — via `superpowers:using-git-worktrees` or any other skill — unless explicitly asked for in that task.** Work directly in the current workspace/branch by default. This overrides any skill step that creates a worktree for isolation.
