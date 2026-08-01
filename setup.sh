@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+    for candidate in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+        if [ -x "$candidate" ]; then
+            exec "$candidate" "$0" "$@"
+        fi
+    done
+    echo "setup.sh needs bash 4+ (found ${BASH_VERSION:-unknown}). macOS's built-in bash is too old — run 'brew install bash' first, then re-run this script." >&2
+    exit 1
+fi
+
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Ordered list of section keys, used for selection, help text, and execution order.
