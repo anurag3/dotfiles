@@ -8,6 +8,9 @@ input=$(cat)
 # --- Line 1: Model, context, cost, session duration ---
 model=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
 
+effort=$(echo "$input" | jq -r '.effort.level // empty')
+[ -n "$effort" ] && model="$model [$effort]"
+
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 if [ -n "$used_pct" ]; then
   ctx_str=$(printf "%.1f%%" "$used_pct")
