@@ -12,3 +12,6 @@
 	insteadOf = https://github.com/
 [core]
 	excludesFile = /Users/anurag.desai/.gitignore_global
+[pull]
+	autostash = true
+	rebase = true

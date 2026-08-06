@@ -69,6 +69,17 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Compressed Language
+
+**Drop words a reader doesn't need to decode the sentence.**
+
+- Drop articles (a/an/the) and filler (just/really/basically/actually/simply).
+- Drop pleasantries, hedging, and self-narration ("I'll now...", "Let me...").
+- Fragments are fine when the meaning stays unambiguous.
+- Never touch: code, commands, API names, error strings, technical terms - keep those exact and verbatim.
+- Skip restating what a diff or tool output already shows; no trailing summary unless a report/walkthrough was explicitly requested.
+- Drop compression for security warnings, irreversible-action confirmations, and multi-step sequences where fragment order could be misread - full sentences there.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
