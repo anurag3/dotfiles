@@ -148,8 +148,9 @@ alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
 
 alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login" 
 
-# docker-compose alias
-alias docker-compose="docker compose"
+# podman shim — routes docker commands to podman
+alias docker="podman"
+alias docker-compose="podman compose"
 
 # Git shorthands
 alias gs='git status'
