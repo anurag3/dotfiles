@@ -56,10 +56,27 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
-select_sections_interactively() {
-    declare -gA CHOSEN
-    local key cursor=0 key_count="${#SECTION_KEYS[@]}"
-    for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done
+# select_checklist <title> <output_array_name> <key1> <desc1> [<key2> <desc2> ...]
+# Interactive checkbox picker (↑/k ↓/j move, space toggle, a/n all/none,
+# enter confirm, q abort-whole-script). All keys start pre-checked. Writes
+# the chosen keys, in input order, into the array named by
+# <output_array_name>. An empty result is valid — the caller decides what
+# that means.
+select_checklist() {
+    local title="$1" out_name="$2"
+    shift 2
+    local -n out_ref="$out_name"
+    local -a keys=()
+    local -A desc=()
+    while [ "$#" -gt 0 ]; do
+        keys+=("$1")
+        desc["$1"]="$2"
+        shift 2
+    done
+
+    local -A chosen
+    local key cursor=0 key_count="${#keys[@]}"
+    for key in "${keys[@]}"; do chosen[$key]=1; done
 
     local old_stty
     old_stty=$(stty -g)
@@ -68,18 +85,18 @@ select_sections_interactively() {
 
     while true; do
         clear
-        echo "Dotfiles Setup — select sections to run"
+        echo "$title"
         echo
         local i=0
-        for key in "${SECTION_KEYS[@]}"; do
+        for key in "${keys[@]}"; do
             local mark=" " pointer=" "
-            [ "${CHOSEN[$key]}" = "1" ] && mark="x"
+            [ "${chosen[$key]}" = "1" ] && mark="x"
             [ "$i" -eq "$cursor" ] && pointer=">"
-            printf "%s [%s] %-12s %s\n" "$pointer" "$mark" "$key" "${SECTION_DESC[$key]}"
+            printf "%s [%s] %-12s %s\n" "$pointer" "$mark" "$key" "${desc[$key]}"
             i=$((i + 1))
         done
         echo
-        echo "↑/k ↓/j move   space toggle   a all   n none   q quit   enter run"
+        echo "↑/k ↓/j move   space toggle   a all   n none   q quit   enter confirm"
 
         local keypress rest
         IFS= read -rsn1 keypress
@@ -92,11 +109,11 @@ select_sections_interactively() {
             $'\x1b[A'|k|K) [ "$cursor" -gt 0 ] && cursor=$((cursor - 1)) ;;
             $'\x1b[B'|j|J) [ "$cursor" -lt $((key_count - 1)) ] && cursor=$((cursor + 1)) ;;
             ' ')
-                key="${SECTION_KEYS[$cursor]}"
-                [ "${CHOSEN[$key]}" = "1" ] && CHOSEN[$key]=0 || CHOSEN[$key]=1
+                key="${keys[$cursor]}"
+                [ "${chosen[$key]}" = "1" ] && chosen[$key]=0 || chosen[$key]=1
                 ;;
-            a|A) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=1; done ;;
-            n|N) for key in "${SECTION_KEYS[@]}"; do CHOSEN[$key]=0; done ;;
+            a|A) for key in "${keys[@]}"; do chosen[$key]=1; done ;;
+            n|N) for key in "${keys[@]}"; do chosen[$key]=0; done ;;
             q|Q)
                 echo "Aborted."
                 exit 0
@@ -108,10 +125,19 @@ select_sections_interactively() {
     stty "$old_stty"
     trap - EXIT
 
-    SELECTED=()
-    for key in "${SECTION_KEYS[@]}"; do
-        [ "${CHOSEN[$key]}" = "1" ] && SELECTED+=("$key")
+    out_ref=()
+    for key in "${keys[@]}"; do
+        [ "${chosen[$key]}" = "1" ] && out_ref+=("$key")
     done
+}
+
+select_sections_interactively() {
+    local args=() key
+    for key in "${SECTION_KEYS[@]}"; do
+        args+=("$key" "${SECTION_DESC[$key]}")
+    done
+
+    select_checklist "Dotfiles Setup — select sections to run" SELECTED "${args[@]}"
 
     if [ "${#SELECTED[@]}" -eq 0 ]; then
         echo "No sections selected — nothing to do."
