@@ -325,9 +325,9 @@ parse_brewfile() {
 brew_category_items() {
     local -n _items_out="$2"
     mapfile -t _items_out <<< "${BREW_CATEGORY_LINES[$1]}"
-    local filtered=() it
-    for it in "${_items_out[@]}"; do [ -n "$it" ] && filtered+=("$it"); done
-    _items_out=("${filtered[@]}")
+    local _bci_filtered=() _bci_it
+    for _bci_it in "${_items_out[@]}"; do [ -n "$_bci_it" ] && _bci_filtered+=("$_bci_it"); done
+    _items_out=("${_bci_filtered[@]}")
 }
 
 section_brew() {
