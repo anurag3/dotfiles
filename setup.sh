@@ -87,13 +87,29 @@ select_checklist() {
         clear
         echo "$title"
         echo
-        local i=0
-        for key in "${keys[@]}"; do
+
+        local term_height
+        term_height=$(tput lines 2>/dev/null) || term_height=24
+        local visible_rows=$((term_height - 4))  # title (2 lines) + footer (2 lines)
+        [ "$visible_rows" -lt 1 ] && visible_rows=1
+
+        local scroll_offset=0 visible_end="$key_count"
+        if [ "$key_count" -gt "$visible_rows" ]; then
+            # Center the window on the cursor, clamped to the list bounds.
+            scroll_offset=$((cursor - visible_rows / 2))
+            [ "$scroll_offset" -lt 0 ] && scroll_offset=0
+            local max_offset=$((key_count - visible_rows))
+            [ "$scroll_offset" -gt "$max_offset" ] && scroll_offset=$max_offset
+            visible_end=$((scroll_offset + visible_rows))
+        fi
+
+        local i
+        for ((i = scroll_offset; i < visible_end; i++)); do
+            key="${keys[$i]}"
             local mark=" " pointer=" "
             [ "${chosen[$key]}" = "1" ] && mark="x"
             [ "$i" -eq "$cursor" ] && pointer=">"
             printf "%s [%s] %-12s %s\n" "$pointer" "$mark" "$key" "${desc[$key]}"
-            i=$((i + 1))
         done
         echo
         echo "↑/k ↓/j move   space toggle   a all   n none   q quit   enter confirm"
@@ -129,6 +145,7 @@ select_checklist() {
     for key in "${keys[@]}"; do
         [ "${chosen[$key]}" = "1" ] && out_ref+=("$key")
     done
+    return 0
 }
 
 select_sections_interactively() {
@@ -355,6 +372,10 @@ select_brew_items() {
     done
 
     BREW_FILTERED_FILE=$(mktemp)
+    # Set the EXIT trap here, after both select_checklist calls above: each of
+    # those ends with its own unconditional `trap - EXIT`, so no earlier trap
+    # is pending to be clobbered, and nothing below touches the EXIT trap again.
+    trap 'rm -f "$BREW_FILTERED_FILE"' EXIT
     printf '%s\n' "${BREW_TAP_LINES[@]}" "${selected_lines[@]}" > "$BREW_FILTERED_FILE"
 }
 
@@ -367,18 +388,14 @@ if ! command -v brew &>/dev/null; then
 fi
 
 local brewfile="$DOTFILES_DIR/Brewfile"
-local cleanup_brewfile=0
 if [ -t 0 ]; then
     select_brew_items
     brewfile="$BREW_FILTERED_FILE"
-    cleanup_brewfile=1
 fi
 
 echo "==> Running brew bundle..."
 brew bundle --file="$brewfile"
 brew cleanup
-
-[ "$cleanup_brewfile" -eq 1 ] && rm -f "$brewfile"
 }
 
 ###############################################################################
