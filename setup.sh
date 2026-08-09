@@ -330,6 +330,34 @@ brew_category_items() {
     _items_out=("${_bci_filtered[@]}")
 }
 
+# Interactive category + per-category item picker. Writes the chosen
+# tap + brew/cask/vscode lines to a temp Brewfile and sets
+# BREW_FILTERED_FILE to its path.
+select_brew_items() {
+    parse_brewfile
+
+    local cat_args=() cat items
+    for cat in "${BREW_CATEGORIES[@]}"; do
+        brew_category_items "$cat" items
+        cat_args+=("$cat" "(${#items[@]} items)")
+    done
+
+    local chosen_categories
+    select_checklist "Homebrew — select categories to install" chosen_categories "${cat_args[@]}"
+
+    local selected_lines=() chosen_items item_args it
+    for cat in "${chosen_categories[@]}"; do
+        brew_category_items "$cat" items
+        item_args=()
+        for it in "${items[@]}"; do item_args+=("$it" ""); done
+        select_checklist "Homebrew — $cat" chosen_items "${item_args[@]}"
+        selected_lines+=("${chosen_items[@]}")
+    done
+
+    BREW_FILTERED_FILE=$(mktemp)
+    printf '%s\n' "${BREW_TAP_LINES[@]}" "${selected_lines[@]}" > "$BREW_FILTERED_FILE"
+}
+
 section_brew() {
 echo "==> Installing Homebrew..."
 if ! command -v brew &>/dev/null; then
@@ -338,9 +366,19 @@ if ! command -v brew &>/dev/null; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+local brewfile="$DOTFILES_DIR/Brewfile"
+local cleanup_brewfile=0
+if [ -t 0 ]; then
+    select_brew_items
+    brewfile="$BREW_FILTERED_FILE"
+    cleanup_brewfile=1
+fi
+
 echo "==> Running brew bundle..."
-brew bundle --file="$DOTFILES_DIR/Brewfile"
+brew bundle --file="$brewfile"
 brew cleanup
+
+[ "$cleanup_brewfile" -eq 1 ] && rm -f "$brewfile"
 }
 
 ###############################################################################
