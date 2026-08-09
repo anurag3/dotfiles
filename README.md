@@ -29,6 +29,7 @@ Runs as a set of selectable sections (interactive checklist, or pass section nam
 - Configures Spotlight search categories
 - Copies iTerm2 preferences
 - Copies Ghostty config
+- Copies herdr config
 - Copies Cursor settings + installs extensions
 - Configures the Claude Code status line
 - Sets Cursor as the default editor
@@ -55,6 +56,7 @@ dotfiles/
 ├── claude/           # ~/.claude/ subset
 ├── nvim/             # Neovim (LazyVim) config
 ├── ghostty/          # Ghostty terminal config
+├── herdr/            # herdr config (workspace/pane keybindings, etc.)
 ├── iterm2/           # iTerm2 prefs (auto-synced by iTerm2 on quit)
 ├── rectangle/        # Rectangle window manager prefs
 ├── vorssaint/        # Vorssaint prefs

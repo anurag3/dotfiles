@@ -151,6 +151,7 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 # podman shim — routes docker commands to podman
 alias docker="podman"
 alias docker-compose="podman compose"
+export PODMAN_COMPOSE_WARNING_LOGS=false
 
 # Git shorthands
 alias gs='git status'
@@ -219,6 +220,10 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+
+# Databricks CLI completions
+fpath+=/opt/homebrew/share/zsh/site-functions
+autoload -Uz compinit && compinit
 
 # fpath=(/Users/anurag.desai/.docker/completions $fpath)
 # autoload -Uz compinit

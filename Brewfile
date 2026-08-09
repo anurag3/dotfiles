@@ -74,6 +74,7 @@ brew "jfrog-cli"
 # Misc
 brew "asdf"
 brew "dockutil"
+brew "herdr"
 brew "rtk"
 
 # ------- Apps -------

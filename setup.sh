@@ -14,7 +14,7 @@ fi
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Ordered list of section keys, used for selection, help text, and execution order.
-SECTION_KEYS=(macos xcode brew git zsh dotfiles claude nvim vscode rectangle vorssaint spotlight iterm2 ghostty cursor statusline editor bun sublime textreplace)
+SECTION_KEYS=(macos xcode brew git zsh dotfiles claude nvim vscode rectangle vorssaint spotlight iterm2 ghostty herdr cursor statusline editor bun sublime textreplace)
 
 declare -A SECTION_DESC=(
     [macos]="macOS defaults (keyboard, trackpad, Finder, Dock, etc.)"
@@ -31,6 +31,7 @@ declare -A SECTION_DESC=(
     [spotlight]="Spotlight search categories"
     [iterm2]="iTerm2 preferences"
     [ghostty]="Ghostty config"
+    [herdr]="herdr config"
     [cursor]="Cursor settings + extensions"
     [statusline]="Claude Code status line"
     [editor]="Default editor (Cursor)"
@@ -430,6 +431,15 @@ echo "==> Symlinking Ghostty config..."
 GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
 mkdir -p "$GHOSTTY_DIR"
 ln -sf "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
+}
+
+###############################################################################
+# herdr Config                                                                #
+###############################################################################
+section_herdr() {
+echo "==> Symlinking herdr config..."
+mkdir -p "$HOME/.config/herdr"
+ln -sf "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 }
 
 ###############################################################################

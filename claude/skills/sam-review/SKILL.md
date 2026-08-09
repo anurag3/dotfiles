@@ -28,6 +28,16 @@ gh pr view <PR URL> --json title,body,files,additions,deletions,commits
 gh pr diff <PR URL> --patch > /tmp/pr<number>.diff
 ```
 
+The PR's branch is usually not checked out locally — the working tree is most often
+on the base branch (e.g. `develop`/`main`), which may lack the file entirely or hold
+an older version of it. Derive every `Location` (`file.py:42`) citation from the diff
+file's own hunk headers (`@@ -a,b +c,d @@`), not from grepping or reading the file in
+the local working tree — that's the same local-checkout trap the Large PR Fan-Out
+Protocol guards sub-agents against, and it applies just as much to a direct review.
+Only read local files to pull in context the diff itself doesn't show (e.g. an
+unchanged helper the diff calls into) — and even then, confirm via the diff that the
+surrounding code is unchanged before trusting the local version's line numbers.
+
 ---
 
 ## Domain Routing

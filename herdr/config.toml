@@ -1,0 +1,25 @@
+onboarding = false
+[theme]
+name = "vesper"
+auto_switch = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+agent_panel_sort = "priority"
+sidebar_start_collapsed = false     # keep the workspace list visible across many repos
+confirm_close = true                # don't kill a running agent pane by accident
+prompt_new_workspace_name = true    # named workspaces scan faster in the picker than auto ids
+
+[ui.toast]
+delivery = "system"
+delay_seconds = 1
+
+[advanced]
+scrollback_limit_bytes = 20000000   # 10MB default is thin for long agent output logs
+
+[keys]
+# Direct ctrl+alt chords, no prefix step — plain alt is unusable on macOS
+# (Option composes accented chars), ctrl+alt is left alone by the terminal.
+previous_workspace = "ctrl+alt+["
+next_workspace = "ctrl+alt+]"
+switch_workspace = "ctrl+alt+1..9"
