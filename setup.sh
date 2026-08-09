@@ -287,6 +287,49 @@ xcode-select --install 2>/dev/null || true
 ###############################################################################
 # Homebrew                                                                    #
 ###############################################################################
+
+# Parses $DOTFILES_DIR/Brewfile into:
+#   BREW_TAP_LINES      - raw `tap ...` lines (always installed, never selectable)
+#   BREW_CATEGORIES     - ordered category names (from `# comment` headers), skipping empty ones
+#   BREW_CATEGORY_LINES - category name -> newline-joined raw `brew`/`cask`/`vscode` lines
+parse_brewfile() {
+    BREW_TAP_LINES=()
+    BREW_CATEGORIES=()
+    declare -gA BREW_CATEGORY_LINES=()
+
+    local line current_cat=""
+    while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in
+            "#"*)
+                local hdr="${line#"# "}"
+                case "$hdr" in
+                    -------*) continue ;;
+                esac
+                current_cat="$hdr"
+                ;;
+            "tap "*)
+                BREW_TAP_LINES+=("$line")
+                ;;
+            "brew "*|"cask "*|"vscode "*)
+                if [ -z "${BREW_CATEGORY_LINES[$current_cat]:-}" ]; then
+                    BREW_CATEGORIES+=("$current_cat")
+                fi
+                BREW_CATEGORY_LINES[$current_cat]+="$line"$'\n'
+                ;;
+        esac
+    done < "$DOTFILES_DIR/Brewfile"
+}
+
+# brew_category_items <category> <out_array_name>
+# Splits a category's newline-joined lines into a clean array (via nameref).
+brew_category_items() {
+    local -n _items_out="$2"
+    mapfile -t _items_out <<< "${BREW_CATEGORY_LINES[$1]}"
+    local filtered=() it
+    for it in "${_items_out[@]}"; do [ -n "$it" ] && filtered+=("$it"); done
+    _items_out=("${filtered[@]}")
+}
+
 section_brew() {
 echo "==> Installing Homebrew..."
 if ! command -v brew &>/dev/null; then
