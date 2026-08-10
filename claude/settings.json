@@ -61,7 +61,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bunx -y ccstatusline@latest",
+    "command": "/Users/anurag.desai/.claude/statusline-command.sh",
     "padding": 0,
     "refreshInterval": 1
   },

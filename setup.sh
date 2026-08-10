@@ -599,12 +599,12 @@ if [ -f "$CLAUDE_SETTINGS" ]; then
 import json
 with open('$CLAUDE_SETTINGS') as f:
     s = json.load(f)
-s['statusLine'] = {'type': 'command', 'command': 'bunx -y ccstatusline@latest', 'padding': 0, 'refreshInterval': 1}
+s['statusLine'] = {'type': 'command', 'command': '$HOME/.claude/statusline-command.sh', 'padding': 0, 'refreshInterval': 1}
 with open('$CLAUDE_SETTINGS', 'w') as f:
     json.dump(s, f, indent=2)
 "
 else
-    echo '{"statusLine":{"type":"command","command":"bunx -y ccstatusline@latest","padding":0,"refreshInterval":1}}' > "$CLAUDE_SETTINGS"
+    echo "{\"statusLine\":{\"type\":\"command\",\"command\":\"$HOME/.claude/statusline-command.sh\",\"padding\":0,\"refreshInterval\":1}}" > "$CLAUDE_SETTINGS"
 fi
 }
 
