@@ -393,6 +393,9 @@ if [ -t 0 ]; then
     brewfile="$BREW_FILTERED_FILE"
 fi
 
+echo "==> Trusting non-official taps..."
+brew trust --tap atlassian/acli vorssaint/tap codecrafters-io/tap databricks/tap hginsights/tap jundot/omlx
+
 echo "==> Running brew bundle..."
 brew bundle --file="$brewfile"
 brew cleanup
