@@ -35,12 +35,11 @@
       "Bash(mkdir -p ~/.claude/plans/**)",
       "Bash(rtk mkdir -p /Users/anurag.desai/.claude/plans/**)",
       "Bash(rtk mkdir -p ~/.claude/plans/**)",
-      "Write(/Users/anurag.desai/.claude/plans/**)",
-      "Write(~/.claude/plans/**)",
       "Edit(/Users/anurag.desai/.claude/plans/**)",
       "Edit(~/.claude/plans/**)",
       "Bash(defaults read *)"
     ],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "~/.claude/plans/"
     ]
@@ -57,8 +56,21 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/anurag.desai/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "/Users/anurag.desai/.claude/statusline-command.sh",
@@ -70,7 +82,8 @@
     "skill-creator@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "i-have-adhd@i-have-adhd": true
   },
   "extraKnownMarketplaces": {
     "obsidian-skills": {
@@ -78,11 +91,21 @@
         "source": "github",
         "repo": "kepano/obsidian-skills"
       }
+    },
+    "i-have-adhd": {
+      "source": {
+        "source": "github",
+        "repo": "ayghri/i-have-adhd"
+      }
     }
   },
+  "feedbackSurveyRate": 0,
+  "spinnerTipsEnabled": true,
   "tui": "fullscreen",
+  "theme": "auto",
+  "editorMode": "normal",
+  "verbose": false,
   "autoCompactEnabled": true,
   "autoScrollEnabled": true,
-  "feedbackSurveyRate": 0,
-  "spinnerTipsEnabled": true
+  "outputStyle": "Concise" 
 }

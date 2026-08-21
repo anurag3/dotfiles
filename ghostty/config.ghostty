@@ -16,7 +16,8 @@ confirm-close-surface = false
 # ── Theme ─────────────────────────────────
 
 # Built-in theme (run `ghostty +list-themes` to browse)
-theme = Monokai Soda
+config-file = ?auto/theme.ghostty
+#theme = Ghostty Default Style Dark
 
 # ── Font ──────────────────────────────────
 
