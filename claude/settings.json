@@ -44,7 +44,6 @@
       "~/.claude/plans/"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "PreToolUse": [
       {
@@ -99,13 +98,15 @@
       }
     }
   },
+  "outputStyle": "ad-concise",
   "feedbackSurveyRate": 0,
   "spinnerTipsEnabled": true,
+  "effortLevel": "high",
   "tui": "fullscreen",
   "theme": "auto",
   "editorMode": "normal",
   "verbose": false,
   "autoCompactEnabled": true,
   "autoScrollEnabled": true,
-  "outputStyle": "Concise" 
+  "model": "opusplan"
 }
