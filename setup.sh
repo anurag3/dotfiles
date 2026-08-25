@@ -40,11 +40,32 @@ declare -A SECTION_DESC=(
     [textreplace]="Text replacements"
 )
 
+# Sections that always run automatically in Setup mode, before gum is
+# available — these have no work/personal split and no picker.
+BASICS_KEYS=(macos xcode git zsh dotfiles ghostty)
+
+# Everything else, picked interactively once gum (or the tput fallback) is
+# ready. Order preserved from SECTION_KEYS.
+INTERACTIVE_KEYS=()
+for key in "${SECTION_KEYS[@]}"; do
+    is_basic=0
+    for b in "${BASICS_KEYS[@]}"; do [ "$key" = "$b" ] && { is_basic=1; break; }; done
+    [ "$is_basic" -eq 0 ] && INTERACTIVE_KEYS+=("$key")
+done
+
+have_gum() { command -v gum &>/dev/null; }
+
 usage() {
     echo "Usage: $0 [section...]"
     echo
-    echo "Run with no arguments for an interactive selection menu, or list one or more"
-    echo "section names to run only those, skipping the menu:"
+    echo "Run with no arguments for an interactive Setup/Maintain mode picker."
+    echo "Setup mode runs macos/xcode/brew-bootstrap/git/zsh/dotfiles/ghostty"
+    echo "automatically, asks work vs. personal, then lets you pick the rest."
+    echo "Maintain mode audits installed brew/Cursor items against Brewfile and"
+    echo "cursor/extensions.txt, and lets you uninstall + untrack selections."
+    echo
+    echo "Or list one or more section names to run only those, skipping both"
+    echo "the mode picker and the machine-type prompt:"
     echo
     for key in "${SECTION_KEYS[@]}"; do
         printf "  %-12s %s\n" "$key" "${SECTION_DESC[$key]}"
@@ -56,15 +77,17 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
-# select_checklist <title> <output_array_name> <key1> <desc1> [<key2> <desc2> ...]
+# select_checklist <title> <output_array_name> <all|none> <key1> <desc1> [<key2> <desc2> ...]
 # Interactive checkbox picker (↑/k ↓/j move, space toggle, a/n all/none,
-# enter confirm, q abort-whole-script). All keys start pre-checked. Writes
-# the chosen keys, in input order, into the array named by
-# <output_array_name>. An empty result is valid — the caller decides what
-# that means.
+# enter confirm, q abort-whole-script). <all|none> sets the starting state
+# of every key — "none" for destructive/removal pickers so nothing is
+# selected by accident. Writes the chosen keys, in input order, into the
+# array named by <output_array_name>. An empty result is valid — the caller
+# decides what that means. Uses gum for the UI when installed, otherwise
+# falls back to a hand-rolled tput picker.
 select_checklist() {
-    local title="$1" out_name="$2"
-    shift 2
+    local title="$1" out_name="$2" default_state="$3"
+    shift 3
     local -n out_ref="$out_name"
     local -a keys=()
     local -A desc=()
@@ -74,9 +97,45 @@ select_checklist() {
         shift 2
     done
 
+    if [ "${#keys[@]}" -eq 0 ]; then
+        out_ref=()
+        return 0
+    fi
+
+    if have_gum; then
+        local -a labels=() chosen_labels=()
+        local -A chosen_set=()
+        local key label sel_default
+        for key in "${keys[@]}"; do
+            if [ -n "${desc[$key]}" ]; then
+                labels+=("$key  —  ${desc[$key]}")
+            else
+                labels+=("$key")
+            fi
+        done
+        if [ "$default_state" = "all" ]; then
+            sel_default=$(printf '%s\x1f' "${labels[@]}")
+            sel_default="${sel_default%$'\x1f'}"
+            mapfile -t chosen_labels < <(gum choose --no-limit --header="$title" \
+                --selected="$sel_default" --selected-delimiter=$'\x1f' "${labels[@]}")
+        else
+            mapfile -t chosen_labels < <(gum choose --no-limit --header="$title" "${labels[@]}")
+        fi
+        for label in "${chosen_labels[@]}"; do chosen_set["$label"]=1; done
+        out_ref=()
+        local i=0
+        for key in "${keys[@]}"; do
+            [ -n "${chosen_set[${labels[$i]}]:-}" ] && out_ref+=("$key")
+            i=$((i + 1))
+        done
+        return 0
+    fi
+
     local -A chosen
     local key cursor=0 key_count="${#keys[@]}"
-    for key in "${keys[@]}"; do chosen[$key]=1; done
+    local initial=1
+    [ "$default_state" = "none" ] && initial=0
+    for key in "${keys[@]}"; do chosen[$key]=$initial; done
 
     local old_stty
     old_stty=$(stty -g)
@@ -148,27 +207,116 @@ select_checklist() {
     return 0
 }
 
+# select_single <title> <output_var_name> <key1> <desc1> [<key2> <desc2> ...]
+# Single-choice picker (↑/k ↓/j move, enter confirm, q abort-whole-script).
+# Writes the chosen key into the scalar named by <output_var_name>. Uses gum
+# when installed, otherwise falls back to a hand-rolled tput picker.
+select_single() {
+    local title="$1" out_name="$2"
+    shift 2
+    local -n out_ref="$out_name"
+    local -a keys=()
+    local -A desc=()
+    while [ "$#" -gt 0 ]; do
+        keys+=("$1")
+        desc["$1"]="$2"
+        shift 2
+    done
+
+    local -a labels=()
+    local key
+    for key in "${keys[@]}"; do
+        if [ -n "${desc[$key]}" ]; then
+            labels+=("$key  —  ${desc[$key]}")
+        else
+            labels+=("$key")
+        fi
+    done
+
+    if have_gum; then
+        local chosen_label
+        chosen_label=$(gum choose --header="$title" "${labels[@]}")
+        local i=0
+        for key in "${keys[@]}"; do
+            [ "${labels[$i]}" = "$chosen_label" ] && { out_ref="$key"; return 0; }
+            i=$((i + 1))
+        done
+        return 0
+    fi
+
+    local old_stty
+    old_stty=$(stty -g)
+    stty -echo -icanon
+    trap 'stty "$old_stty"' EXIT
+
+    local cursor=0 key_count="${#keys[@]}"
+    while true; do
+        clear
+        echo "$title"
+        echo
+
+        local i pointer
+        for ((i = 0; i < key_count; i++)); do
+            pointer=" "
+            [ "$i" -eq "$cursor" ] && pointer=">"
+            printf "%s %s\n" "$pointer" "${labels[$i]}"
+        done
+        echo
+        echo "↑/k ↓/j move   q quit   enter confirm"
+
+        local keypress rest
+        IFS= read -rsn1 keypress
+        if [ "$keypress" = $'\x1b' ]; then
+            IFS= read -rsn2 -t 0.05 rest || true
+            keypress+="$rest"
+        fi
+
+        case "$keypress" in
+            $'\x1b[A'|k|K) [ "$cursor" -gt 0 ] && cursor=$((cursor - 1)) ;;
+            $'\x1b[B'|j|J) [ "$cursor" -lt $((key_count - 1)) ] && cursor=$((cursor + 1)) ;;
+            q|Q)
+                echo "Aborted."
+                exit 0
+                ;;
+            "") break ;;
+        esac
+    done
+
+    stty "$old_stty"
+    trap - EXIT
+
+    out_ref="${keys[$cursor]}"
+}
+
 select_sections_interactively() {
     local args=() key
-    for key in "${SECTION_KEYS[@]}"; do
+    for key in "${INTERACTIVE_KEYS[@]}"; do
         args+=("$key" "${SECTION_DESC[$key]}")
     done
 
-    select_checklist "Dotfiles Setup — select sections to run" SELECTED "${args[@]}"
+    select_checklist "Dotfiles Setup — select additional sections to run" SELECTED all "${args[@]}"
 
     if [ "${#SELECTED[@]}" -eq 0 ]; then
-        echo "No sections selected — nothing to do."
-        exit 0
+        echo "No additional sections selected."
     fi
 }
 
 if [ "$#" -eq 0 ]; then
     if [ -t 0 ]; then
-        select_sections_interactively
+        select_single "Dotfiles — choose mode" MODE \
+            setup    "Set up this machine (install/configure)" \
+            maintain "Maintain this machine (audit/remove brew + Cursor extensions)"
+        if [ "$MODE" = "setup" ]; then
+            select_single "Dotfiles Setup — machine type" MACHINE_TYPE \
+                work     "Work machine (work + common tools)" \
+                personal "Personal machine (personal + common tools)"
+        fi
     else
+        MODE="setup"
         SELECTED=("${SECTION_KEYS[@]}")
     fi
 else
+    MODE="setup"
     SELECTED=("$@")
     for key in "${SELECTED[@]}"; do
         if [ -z "${SECTION_DESC[$key]:-}" ]; then
@@ -347,27 +495,71 @@ brew_category_items() {
     _items_out=("${_bci_filtered[@]}")
 }
 
-# Interactive category + per-category item picker. Writes the chosen
+# brewfile_line_bucket <raw_brewfile_line>
+# Reads the trailing "# work|personal|common" tag off a tap/brew/cask/vscode
+# line; untagged lines default to common.
+brewfile_line_bucket() {
+    local line="$1"
+    if [[ "$line" =~ \#[[:space:]]*(work|personal|common)[[:space:]]*$ ]]; then
+        echo "${BASH_REMATCH[1]}"
+    else
+        echo "common"
+    fi
+}
+
+ensure_homebrew() {
+if ! command -v brew &>/dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Apple Silicon: add brew to PATH for remainder of script
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+}
+
+# select_brew_items [machine_type]
+# Interactive category + per-category item picker, offered items limited to
+# [machine_type] + common (an empty machine_type means no filtering — every
+# tap/brew/cask/vscode entry is offered, matching direct `setup.sh brew`
+# invocations that bypass the machine-type prompt). Writes the chosen
 # tap + brew/cask/vscode lines to a temp Brewfile and sets
 # BREW_FILTERED_FILE to its path.
 select_brew_items() {
+    local machine_type="${1:-}"
     parse_brewfile
+
+    local -a filtered_taps=()
+    local tline bucket
+    for tline in "${BREW_TAP_LINES[@]}"; do
+        bucket=$(brewfile_line_bucket "$tline")
+        if [ -z "$machine_type" ] || [ "$bucket" = "$machine_type" ] || [ "$bucket" = "common" ]; then
+            filtered_taps+=("$tline")
+        fi
+    done
+    BREW_TAP_LINES=("${filtered_taps[@]}")
 
     local cat_args=() cat items
     for cat in "${BREW_CATEGORIES[@]}"; do
         brew_category_items "$cat" items
-        cat_args+=("$cat" "(${#items[@]} items)")
+        local -a cat_items=() it
+        for it in "${items[@]}"; do
+            bucket=$(brewfile_line_bucket "$it")
+            if [ -z "$machine_type" ] || [ "$bucket" = "$machine_type" ] || [ "$bucket" = "common" ]; then
+                cat_items+=("$it")
+            fi
+        done
+        [ "${#cat_items[@]}" -eq 0 ] && continue
+        BREW_CATEGORY_LINES[$cat]=$(printf '%s\n' "${cat_items[@]}")
+        cat_args+=("$cat" "(${#cat_items[@]} items)")
     done
 
     local chosen_categories
-    select_checklist "Homebrew — select categories to install" chosen_categories "${cat_args[@]}"
+    select_checklist "Homebrew — select categories to install" chosen_categories all "${cat_args[@]}"
 
     local selected_lines=() chosen_items item_args it
     for cat in "${chosen_categories[@]}"; do
         brew_category_items "$cat" items
         item_args=()
         for it in "${items[@]}"; do item_args+=("$it" ""); done
-        select_checklist "Homebrew — $cat" chosen_items "${item_args[@]}"
+        select_checklist "Homebrew — $cat" chosen_items all "${item_args[@]}"
         selected_lines+=("${chosen_items[@]}")
     done
 
@@ -381,20 +573,22 @@ select_brew_items() {
 
 section_brew() {
 echo "==> Installing Homebrew..."
-if ! command -v brew &>/dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Apple Silicon: add brew to PATH for remainder of script
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+ensure_homebrew
 
 local brewfile="$DOTFILES_DIR/Brewfile"
 if [ -t 0 ]; then
-    select_brew_items
+    select_brew_items "${MACHINE_TYPE:-}"
     brewfile="$BREW_FILTERED_FILE"
+else
+    parse_brewfile
 fi
 
 echo "==> Trusting non-official taps..."
-brew trust --tap atlassian/acli vorssaint/tap codecrafters-io/tap databricks/tap hginsights/tap jundot/omlx
+local tap_names=() tline
+for tline in "${BREW_TAP_LINES[@]}"; do
+    [[ "$tline" =~ ^tap[[:space:]]+\"([^\"]+)\" ]] && tap_names+=("${BASH_REMATCH[1]}")
+done
+[ "${#tap_names[@]}" -gt 0 ] && brew trust --tap "${tap_names[@]}"
 
 echo "==> Running brew bundle..."
 brew bundle --file="$brewfile"
@@ -680,11 +874,188 @@ defaults write -g NSUserReplacementItems -array \
   '{ replace = "txns"; with = "transactions"; }'
 }
 
-# Ask for the administrator password upfront (only if a selected section needs
-# it) and keep the session alive so nothing prompts for it again mid-run.
-if is_selected macos || is_selected spotlight; then
+###############################################################################
+# Basics (Setup mode — run automatically, no picker)                         #
+###############################################################################
+run_basics() {
+section_macos
+section_xcode
+ensure_homebrew
+
+echo "==> Installing gum..."
+brew list gum &>/dev/null || brew install gum
+
+echo "==> Installing Ghostty..."
+brew list --cask ghostty &>/dev/null || brew install --cask ghostty
+section_ghostty
+
+section_git
+section_zsh
+section_dotfiles
+}
+
+###############################################################################
+# Maintenance mode                                                            #
+###############################################################################
+
+# remove_brewfile_lines <raw_line...>
+# Deletes exact lines from the real Brewfile in place.
+remove_brewfile_lines() {
+    local tmp bf_line rl skip
+    tmp=$(mktemp)
+    while IFS= read -r bf_line || [ -n "$bf_line" ]; do
+        skip=0
+        for rl in "$@"; do
+            [ "$bf_line" = "$rl" ] && { skip=1; break; }
+        done
+        [ "$skip" -eq 1 ] || printf '%s\n' "$bf_line" >> "$tmp"
+    done < "$DOTFILES_DIR/Brewfile"
+    mv "$tmp" "$DOTFILES_DIR/Brewfile"
+}
+
+# Category + per-category item checklist over every current Brewfile entry
+# (no work/personal filtering — maintenance sees everything). Selected
+# entries are uninstalled and stripped from the Brewfile.
+maintain_brewfile_removals() {
+    parse_brewfile
+
+    local cat_args=() cat items
+    for cat in "${BREW_CATEGORIES[@]}"; do
+        brew_category_items "$cat" items
+        cat_args+=("$cat" "(${#items[@]} items)")
+    done
+    [ "${#cat_args[@]}" -eq 0 ] && return 0
+
+    local chosen_categories
+    select_checklist "Maintain — pick categories to review for removal" chosen_categories none "${cat_args[@]}"
+    [ "${#chosen_categories[@]}" -eq 0 ] && return 0
+
+    local to_remove=() chosen_items item_args it
+    for cat in "${chosen_categories[@]}"; do
+        brew_category_items "$cat" items
+        item_args=()
+        for it in "${items[@]}"; do item_args+=("$it" ""); done
+        select_checklist "Maintain — $cat — select items to uninstall" chosen_items none "${item_args[@]}"
+        to_remove+=("${chosen_items[@]}")
+    done
+    [ "${#to_remove[@]}" -eq 0 ] && { echo "Nothing selected for removal."; return 0; }
+
+    echo "About to uninstall and remove from Brewfile:"
+    printf '  %s\n' "${to_remove[@]}"
+    local confirm
+    read -rp "Proceed? [y/N] " confirm
+    case "$confirm" in
+        y|Y) ;;
+        *) echo "Cancelled."; return 0 ;;
+    esac
+
+    local line name
+    for line in "${to_remove[@]}"; do
+        case "$line" in
+            brew\ *)
+                [[ "$line" =~ ^brew[[:space:]]+\"([^\"]+)\" ]] && name="${BASH_REMATCH[1]}"
+                brew uninstall "$name" || true
+                ;;
+            cask\ *)
+                [[ "$line" =~ ^cask[[:space:]]+\"([^\"]+)\" ]] && name="${BASH_REMATCH[1]}"
+                brew uninstall --cask "$name" || true
+                ;;
+            vscode\ *)
+                [[ "$line" =~ ^vscode[[:space:]]+\"([^\"]+)\" ]] && name="${BASH_REMATCH[1]}"
+                code --uninstall-extension "$name" || true
+                ;;
+        esac
+    done
+
+    remove_brewfile_lines "${to_remove[@]}"
+}
+
+# Diffs installed Cursor extensions against cursor/extensions.txt, then lets
+# you pick tracked extensions to uninstall (removed from both Cursor and the
+# tracked file). Only called when the `cursor` CLI is present.
+maintain_cursor_extensions() {
+    echo "==> Checking Cursor extension drift..."
+    local installed_file tracked_file
+    installed_file=$(mktemp)
+    tracked_file=$(mktemp)
+    cursor --list-extensions 2>/dev/null | sort > "$installed_file"
+    sort "$DOTFILES_DIR/cursor/extensions.txt" > "$tracked_file"
+
+    echo "--- Installed but not tracked ---"
+    comm -23 "$installed_file" "$tracked_file"
+    echo
+    echo "--- Tracked but not installed ---"
+    comm -13 "$installed_file" "$tracked_file"
+    echo
+    rm -f "$installed_file" "$tracked_file"
+
+    local ext_args=() ext
+    while IFS= read -r ext || [ -n "$ext" ]; do
+        [ -n "$ext" ] && ext_args+=("$ext" "")
+    done < "$DOTFILES_DIR/cursor/extensions.txt"
+    [ "${#ext_args[@]}" -eq 0 ] && return 0
+
+    local chosen_ext
+    select_checklist "Maintain — Cursor extensions — select to uninstall" chosen_ext none "${ext_args[@]}"
+    [ "${#chosen_ext[@]}" -eq 0 ] && return 0
+
+    echo "About to uninstall Cursor extensions:"
+    printf '  %s\n' "${chosen_ext[@]}"
+    local confirm
+    read -rp "Proceed? [y/N] " confirm
+    case "$confirm" in
+        y|Y) ;;
+        *) echo "Cancelled."; return 0 ;;
+    esac
+
+    for ext in "${chosen_ext[@]}"; do
+        cursor --uninstall-extension "$ext" || true
+    done
+
+    local tmp
+    tmp=$(mktemp)
+    grep -vFxf <(printf '%s\n' "${chosen_ext[@]}") "$DOTFILES_DIR/cursor/extensions.txt" > "$tmp"
+    mv "$tmp" "$DOTFILES_DIR/cursor/extensions.txt"
+}
+
+run_maintenance() {
+echo "==> Checking for drift between Brewfile and installed state..."
+echo "--- In Brewfile but not installed ---"
+brew bundle check --file="$DOTFILES_DIR/Brewfile" --verbose 2>/dev/null | grep '^→' || echo "  (none)"
+echo
+echo "--- Installed but not in Brewfile ---"
+brew bundle cleanup --file="$DOTFILES_DIR/Brewfile" 2>/dev/null | awk '/^Would `brew cleanup`:/{exit} {print}'
+echo
+
+maintain_brewfile_removals
+
+if command -v cursor &>/dev/null; then
+    maintain_cursor_extensions
+fi
+
+echo ""
+echo "✓ Maintenance complete."
+}
+
+if [ "$MODE" = "maintain" ]; then
+    run_maintenance
+    exit 0
+fi
+
+# Setup mode.
+if [ -n "${MACHINE_TYPE:-}" ]; then
+    # No-args interactive path: basics always runs section_macos, so ask for
+    # sudo upfront and keep the session alive for the whole run.
     sudo -v
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    run_basics
+    select_sections_interactively
+else
+    # Args path or non-interactive fallback: SELECTED is already final.
+    if is_selected macos || is_selected spotlight; then
+        sudo -v
+        while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    fi
 fi
 
 for key in "${SELECTED[@]}"; do

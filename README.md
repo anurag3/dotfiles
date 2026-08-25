@@ -1,6 +1,6 @@
 # Anurag's Dotfiles
 
-macOS setup script for migrating to a new machine.
+macOS setup and maintenance for this machine: install/migrate to a new Mac, and audit/clean up brew + Cursor extensions over time.
 
 ## Quickstart
 
@@ -11,9 +11,20 @@ bash setup.sh
 open MIGRATION.md   # complete the manual steps
 ```
 
+Running `setup.sh` with no arguments opens a mode picker:
+
+- **Setup** — installs/configures this machine. Runs macOS defaults, Xcode CLI tools, Homebrew bootstrap, `gum`, git config, Oh My Zsh, dotfiles symlinks, and Ghostty automatically (no picker — same on every machine), then asks whether this is a **work** or **personal** machine (filters the Brewfile to that bucket + shared "common" tools) before handing off to an interactive `gum`-powered checklist for everything else (VSCode, Cursor, Rectangle, Neovim, etc.).
+- **Maintain** — for a machine already set up. Reports drift between the Brewfile / `cursor/extensions.txt` and what's actually installed, then lets you pick brew formulae/casks/VSCode extensions and Cursor extensions to uninstall — removing them from the system and from the tracked file in one step.
+
+Passing section names as args (e.g. `bash setup.sh git zsh`) skips both prompts and runs just those sections, as before.
+
+## Brewfile Categorization
+
+Every `tap`/`brew`/`cask`/`vscode` line in `Brewfile` is tagged `# work`, `# personal`, or `# common` (untagged lines default to common). Setup mode's Homebrew picker filters to your chosen machine type + common; Maintain mode ignores the tags and shows everything.
+
 ## What `setup.sh` Does
 
-Runs as a set of selectable sections (interactive checklist, or pass section names as args):
+Sections (interactive checklist in Setup mode, or pass section names as args):
 
 - Applies macOS defaults (dock, keyboard, trackpad, finder, screenshots)
 - Installs Xcode CLI tools
@@ -28,7 +39,7 @@ Runs as a set of selectable sections (interactive checklist, or pass section nam
 - Imports Vorssaint settings
 - Configures Spotlight search categories
 - Copies iTerm2 preferences
-- Copies Ghostty config
+- Installs + copies Ghostty config
 - Copies herdr config
 - Copies Cursor settings + installs extensions
 - Configures the Claude Code status line

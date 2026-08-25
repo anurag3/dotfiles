@@ -36,6 +36,8 @@ cd ~/dotfiles
 bash setup.sh
 ```
 
+Choose **Setup** at the mode prompt, then **work** or **personal** when asked for machine type — this filters the Homebrew picker to that bucket plus shared "common" tools. See the README for what runs automatically (basics) vs. what you pick interactively.
+
 ## 4. SDKMAN
 
 Install SDKMAN, then reinstall previous candidates. Current versions from old machine:
@@ -120,6 +122,8 @@ If `cursor` CLI wasn't in PATH during `setup.sh`, install extensions manually:
 xargs -L1 cursor --install-extension < ~/dotfiles/cursor/extensions.txt
 ```
 
+Going forward, run `bash setup.sh` and choose **Maintain** to review drift and uninstall/untrack extensions instead of editing `extensions.txt` by hand.
+
 ## 12. MDM / IT-managed Apps
 
 Wait for IT to push via JumpCloud:
@@ -145,7 +149,7 @@ Requires Bun (installed by `setup.sh`). The status line will auto-download `ccst
 ## 14. Verify
 
 ```bash
-# Brew
+# Brew (or: bash setup.sh -> Maintain, for an interactive drift report)
 brew bundle check --file=~/dotfiles/Brewfile
 
 # Git
