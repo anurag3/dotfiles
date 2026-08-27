@@ -4,8 +4,6 @@
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
 ## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
@@ -17,9 +15,11 @@ Before implementing:
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
 
+Example: asked to "cache this" - clarify in-memory per-request vs. persistent across restarts. Don't pick one silently.
+
 ## 2. Simplicity First
 
-**Minimum code that solves the problem. Nothing speculative.**
+**Minimum code that solves the problem. Nothing speculative. Governs scope of new code — for edits to existing code, see Surgical Changes below.**
 
 - No features beyond what was asked.
 - No abstractions for single-use code.
@@ -31,9 +31,13 @@ Before implementing:
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
+Example: asked for "a function to parse dates" - write the function. Don't add a `DateParser` class with configurable formats nobody asked for.
+
 ## 3. Surgical Changes
 
-**Touch only what you must. Clean up only your own mess.**
+**Touch only what you must. Clean up only your own mess. Governs edits to existing code — for scope of new code, see Simplicity First above.**
+
+Example: asked to fix a null check in `foo()` - fix it. Don't reformat the file or rename nearby variables while you're in there.
 
 When editing existing code:
 
@@ -69,27 +73,21 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-## 5. Compressed Language
+## 5. Plan Execution Approach
 
-**Drop words a reader doesn't need to decode the sentence.**
+**Default to subagent-driven development (`superpowers:subagent-driven-development`) for executing multi-task plans — skip the "Execution Handoff" choice prompt in `superpowers:writing-plans` and just proceed.**
 
-- Drop articles (a/an/the) and filler (just/really/basically/actually/simply).
-- Drop pleasantries, hedging, and self-narration ("I'll now...", "Let me...").
-- Fragments are fine when the meaning stays unambiguous.
-- Never touch: code, commands, API names, error strings, technical terms - keep those exact and verbatim.
-- Skip restating what a diff or tool output already shows; no trailing summary unless a report/walkthrough was explicitly requested.
-- Drop compression for security warnings, irreversible-action confirmations, and multi-step sequences where fragment order could be misread - full sentences there.
+Exception: a single isolated task with no multi-task plan behind it — dispatch a subagent directly via the Agent tool instead. The skill's ledger, review gate, and fix-loop exist to survive a long unattended multi-task run; for one task there's nothing for them to coordinate. Otherwise, only deviate if the user explicitly asks for inline execution or another approach.
 
----
+## 6. Spec & Plan File Location
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**Every spec/design doc/RFC and every plan MUST be written to these paths, no exceptions — this overrides any skill-suggested default (e.g. superpowers' `docs/superpowers/specs/...`):**
 
-# Plan Execution Approach
+- Specs: `~/.claude/specs/<repo>/<YYYY-MM-DD>-<description>/<description>_spec.md`
+- Plans: `~/.claude/plans/<repo>/<YYYY-MM-DD>-<description>/<description>_plan.md`
 
-**Default to subagent-driven development (`superpowers:subagent-driven-development`) for executing plans. Do not ask which execution approach to use — just proceed with it.**
+`<repo>` = repo name from `git remote get-url origin` (last path segment, strip `.git`), else `basename "$PWD"`. `<description>` = 2-5 word kebab-case summary (e.g. `add-auth-middleware`). `mkdir -p` the directory before writing. Applies regardless of trigger — brainstorming's "write design doc" step, the writing-plans skill, plan mode, or a direct request to draft one.
 
-This overrides the "Execution Handoff" step in the `superpowers:writing-plans` skill (which asks the user to choose between subagent-driven and inline execution). Only deviate from subagent-driven development if the user explicitly asks for inline execution or another approach for a given task.
+## 7. Worktree Policy
 
-# Worktree Policy
-
-**Never create git worktrees — via `superpowers:using-git-worktrees` or any other skill — unless explicitly asked for in that task.** Work directly in the current workspace/branch by default. This overrides any skill step that creates a worktree for isolation.
+**Never create a git worktree for isolation — via `superpowers:using-git-worktrees`, `subagent-driven-development`'s Setup step, or any other skill — unless the user explicitly asks for one; work directly in the current workspace/branch by default.**

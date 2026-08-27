@@ -44,6 +44,7 @@
       "~/.claude/plans/"
     ]
   },
+  "model": "opusplan",
   "hooks": {
     "PreToolUse": [
       {
@@ -107,6 +108,5 @@
   "editorMode": "normal",
   "verbose": false,
   "autoCompactEnabled": true,
-  "autoScrollEnabled": true,
-  "model": "opusplan"
+  "autoScrollEnabled": true
 }

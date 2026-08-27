@@ -16,8 +16,7 @@ Requires sudo — script prompts for admin password upfront. Idempotent for most
 
 ## Pending Work (from README)
 
-- Spaceship ZSH theme install (currently commented out in setup.sh)
-- Oh-My-ZSH plugins: `zsh-syntax-highlighting`, `zsh-autosuggestions`, `colored-man-pages`
+- Oh-My-ZSH plugin: `colored-man-pages`
 - Python 3 environment via pyenv
 
 ## iTerm2 Color Scheme
