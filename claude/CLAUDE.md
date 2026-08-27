@@ -91,3 +91,7 @@ Exception: a single isolated task with no multi-task plan behind it — dispatch
 ## 7. Worktree Policy
 
 **Never create a git worktree for isolation — via `superpowers:using-git-worktrees`, `subagent-driven-development`'s Setup step, or any other skill — unless the user explicitly asks for one; work directly in the current workspace/branch by default.**
+
+## 8. Simplified Technical English
+
+**Before writing any technical documentation, README, procedure, code comment block, or error/UI string, invoke the `simplified-technical-english` skill first — do not rely on description-matching to trigger it.** Applies to file content authored for a human reader; does not apply to your own conversational replies, which follow the `ad-concise` output style instead.
