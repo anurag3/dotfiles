@@ -4,20 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Does
 
-Single-script macOS setup: `setup.sh` applies `defaults write` macOS preferences and installs dev tooling via Homebrew (git, pyenv, oh-my-zsh, keepingyouawake).
+macOS setup and maintenance script: `setup.sh` applies `defaults write` preferences and symlinks/installs config for ~20 tools (Homebrew, git, zsh, Claude Code, Neovim, VSCode, Cursor, Rectangle, iTerm2, Ghostty, and more — see `SECTION_KEYS` in `setup.sh`).
 
 ## Running the Setup
 
 ```bash
-bash setup.sh
+bash setup.sh              # interactive: pick Setup or Maintain mode
+bash setup.sh git zsh      # or list section names to run only those
 ```
 
-Requires sudo — script prompts for admin password upfront. Idempotent for most steps (Homebrew install check guards re-install).
-
-## Pending Work (from README)
-
-- Oh-My-ZSH plugin: `colored-man-pages`
-- Python 3 environment via pyenv
+- **Setup mode** runs macOS defaults/Xcode/Homebrew bootstrap/git/zsh/dotfiles/Ghostty automatically, asks work vs. personal (filters `Brewfile` by its `# work`/`# personal`/`# common` tags), then offers a `gum` checklist for the rest.
+- **Maintain mode** audits installed brew/Cursor items against `Brewfile`/`cursor/extensions.txt` and lets you uninstall + untrack selections.
+- Sudo is only requested when the `macos` or `spotlight` sections run (or via the no-args interactive path, which always includes `macos`).
+- Requires bash 4+; the script re-execs itself via Homebrew's bash if the system one is too old.
 
 ## iTerm2 Color Scheme
 
