@@ -149,6 +149,26 @@ the PR looks small — subtle issues often hide in small changes.
 
 ---
 
+## Review Text Style
+
+Whoever reads this is triaging fast, not studying prose. Every Issue, Summary,  
+and Verdict line follows these rules:
+
+- Lead with what breaks or what to do — never scene-setting, never "Let's  
+  look at...", never a recap of the diff.
+- One idea per sentence. Max 20 words for an Issue cell, 25 for Summary/Verdict  
+  prose.
+- Active voice, common concrete words. Cut hedges that add no information  
+  ("might", "could possibly", "seems to").
+- No idioms ("circle back", "on the same page") — state the literal action.
+- No preamble ("Great PR!") and no closing pleasantries ("let me know if...",  
+  "hope this helps").
+- Prefer a table over a bulleted list wherever the items are comparable in  
+  shape — it scans faster than prose. Cap any list/table at 5 rows; beyond  
+  that, keep the 5 most significant and drop the rest.
+
+---
+
 ## Output Format
 
 Produce the review in this exact structure. Do not omit any section, even if  
@@ -177,7 +197,9 @@ Severity scale:
 |---|----------|-------|----------|
 
 ### ✅ What's Done Well
-[1–3 bullets. One line each — name the pattern or decision, no elaboration.]
+| # | Pattern |
+|---|---------|
+| 1 | [Name the pattern or decision — no elaboration. Max 5 rows.] |
 
 ### Verdict
 **[APPROVE / REQUEST CHANGES / NEEDS DISCUSSION]**

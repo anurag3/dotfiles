@@ -46,4 +46,4 @@ Return only the findings tables for your slice — no summary, no verdict, no "w
 
 Severity: 🔴 Blocker (data loss/corruption/prod failure risk), 🟡 Major (should fix before merge), 🟢 Minor (follow-up). Use "No issues found." for an empty table.
 
-For every finding, cite the exact `file:line` from the diff and state what breaks and why — not just that something looks off. If a finding depends on code outside your slice (e.g. a shared module another slice also touches), say so explicitly so the orchestrator can check it during reconciliation.
+For every finding, cite the exact `file:line` from the diff and state what breaks and why in 20 words or fewer — active voice, no hedging, no scene-setting. Not just that something looks off. If a finding depends on code outside your slice (e.g. a shared module another slice also touches), say so explicitly so the orchestrator can check it during reconciliation.
