@@ -38,6 +38,21 @@ Only read local files to pull in context the diff itself doesn't show (e.g. an
 unchanged helper the diff calls into) — and even then, confirm via the diff that the
 surrounding code is unchanged before trusting the local version's line numbers.
 
+**Common failure mode:** when you `Read` the `.diff` file, the tool prefixes every line
+with its own line number *within that diff file* (patch email headers, `From ...`,
+`Subject ...`, `diff --git`, `index ...` lines all count). That prefix is NOT the target
+file's line number — it's just where the line sits in the patch text. Never cite a
+`Location` using those prefixes. The only valid inputs to a line-number calculation are:
+1. The hunk header's own starting line (`@@ -a,b +c,d @@` → the target line is `c` for
+   the new file, `a` for a deleted line).
+2. A manual count of hunk lines from that starting point — count every ` ` (context) and
+   `+` (added) line as one line of the new file; skip `-` (removed) lines entirely; skip
+   the hunk header line itself.
+For a deletion-only finding, count against the *old* file using `a` and the `-`/` ` lines
+instead. If a hunk spans more than ~10 lines, count out loud (list each new-file line
+number next to its content) rather than eyeballing it — this is the step that produced
+wrong line numbers before.
+
 ---
 
 ## Domain Routing
