@@ -34,7 +34,7 @@ declare -A SECTION_DESC=(
     [herdr]="herdr config"
     [cursor]="Cursor settings + extensions"
     [statusline]="Claude Code status line"
-    [editor]="Default editor (Cursor)"
+    [editor]="Default editor (Cursor on work, VSCode on personal)"
     [bun]="Bun install"
     [sublime]="Sublime Text settings"
     [textreplace]="Text replacements"
@@ -62,7 +62,8 @@ usage() {
     echo "Setup mode runs macos/xcode/brew-bootstrap/git/zsh/dotfiles/ghostty"
     echo "automatically, asks work vs. personal, then lets you pick the rest."
     echo "Maintain mode audits installed brew/Cursor items against Brewfile and"
-    echo "cursor/extensions.txt, and lets you uninstall + untrack selections."
+    echo "cursor/extensions.txt, and lets you sync untracked installs in and"
+    echo "uninstall + untrack selections out."
     echo
     echo "Or list one or more section names to run only those, skipping both"
     echo "the mode picker and the machine-type prompt:"
@@ -806,22 +807,39 @@ fi
 }
 
 ###############################################################################
-# Default Editor (Cursor)                                                     #
+# Default Editor (Cursor on work machines, VSCode on personal)               #
 ###############################################################################
 section_editor() {
-echo "==> Setting Cursor as default text editor..."
-CURSOR_BUNDLE_ID=$(osascript -e 'id of app "Cursor"' 2>/dev/null)
-if [ -z "$CURSOR_BUNDLE_ID" ]; then
-    echo "    Cursor not found — skipping default editor setup. Re-run after installing Cursor."
+local primary_app fallback_app chosen_app bundle_id
+if [ "${MACHINE_TYPE:-}" = "work" ]; then
+    primary_app="Cursor"
+    fallback_app="Visual Studio Code"
 else
-    duti -s "$CURSOR_BUNDLE_ID" public.plain-text all      # Plain text files
-    duti -s "$CURSOR_BUNDLE_ID" public.text all            # All text UTIs
-    duti -s "$CURSOR_BUNDLE_ID" public.source-code all     # All source code UTIs
-    duti -s "$CURSOR_BUNDLE_ID" public.shell-script all    # Shell scripts
-    duti -s "$CURSOR_BUNDLE_ID" public.json all            # JSON files
-    duti -s "$CURSOR_BUNDLE_ID" public.xml all             # XML files
-    duti -s "$CURSOR_BUNDLE_ID" public.yaml all            # YAML files
+    primary_app="Visual Studio Code"
+    fallback_app="Cursor"
 fi
+
+chosen_app="$primary_app"
+bundle_id=$(osascript -e "id of app \"$primary_app\"" 2>/dev/null)
+if [ -z "$bundle_id" ]; then
+    echo "    $primary_app not found — falling back to $fallback_app."
+    chosen_app="$fallback_app"
+    bundle_id=$(osascript -e "id of app \"$fallback_app\"" 2>/dev/null)
+fi
+
+if [ -z "$bundle_id" ]; then
+    echo "    Neither $primary_app nor $fallback_app found — skipping default editor setup."
+    return
+fi
+
+echo "==> Setting $chosen_app as default text editor..."
+duti -s "$bundle_id" public.plain-text all      # Plain text files
+duti -s "$bundle_id" public.text all            # All text UTIs
+duti -s "$bundle_id" public.source-code all     # All source code UTIs
+duti -s "$bundle_id" public.shell-script all    # Shell scripts
+duti -s "$bundle_id" public.json all            # JSON files
+duti -s "$bundle_id" public.xml all             # XML files
+duti -s "$bundle_id" public.yaml all            # YAML files
 }
 
 ###############################################################################
@@ -970,9 +988,54 @@ maintain_brewfile_removals() {
     remove_brewfile_lines "${to_remove[@]}"
 }
 
+# Diffs installed brew formulae/casks/VSCode extensions against Brewfile
+# (via `brew bundle cleanup`'s dry-run report), then lets you pick untracked
+# items to append, tagged work/personal/common.
+maintain_brewfile_additions() {
+    echo "==> Checking for installed items missing from Brewfile..."
+    local cleanup_output
+    cleanup_output=$(brew bundle cleanup --file="$DOTFILES_DIR/Brewfile" 2>/dev/null)
+
+    local missing_formulae=() missing_casks=() missing_vscode=()
+    mapfile -t missing_formulae < <(awk '/^Would uninstall formulae:$/{f=1;next} /^Would /{f=0} f' <<< "$cleanup_output")
+    mapfile -t missing_casks    < <(awk '/^Would uninstall casks:$/{f=1;next} /^Would /{f=0} f' <<< "$cleanup_output")
+    mapfile -t missing_vscode   < <(awk '/^Would uninstall VSCode extensions:$/{f=1;next} /^Would /{f=0} f' <<< "$cleanup_output")
+
+    echo "--- Installed but not in Brewfile ---"
+    printf '%s\n' "${missing_formulae[@]}" "${missing_casks[@]}" "${missing_vscode[@]}" | grep -v '^$' || echo "  (none)"
+    echo
+
+    local item_args=() name
+    for name in "${missing_formulae[@]}"; do item_args+=("brew:$name" "formula"); done
+    for name in "${missing_casks[@]}";    do item_args+=("cask:$name" "cask"); done
+    for name in "${missing_vscode[@]}";   do item_args+=("vscode:$name" "VSCode extension"); done
+    [ "${#item_args[@]}" -eq 0 ] && return 0
+
+    local chosen
+    select_checklist "Maintain — installed but not in Brewfile — select to add" chosen none "${item_args[@]}"
+    [ "${#chosen[@]}" -eq 0 ] && return 0
+
+    local tag
+    select_single "Maintain — tag for the entries you're adding" tag \
+        common   "Common (both machines)" \
+        work     "Work only" \
+        personal "Personal only"
+
+    grep -qxF "# Synced additions" "$DOTFILES_DIR/Brewfile" || printf '\n# Synced additions\n' >> "$DOTFILES_DIR/Brewfile"
+    local entry type nm
+    for entry in "${chosen[@]}"; do
+        type="${entry%%:*}"
+        nm="${entry#*:}"
+        printf '%s "%s" # %s\n' "$type" "$nm" "$tag" >> "$DOTFILES_DIR/Brewfile"
+    done
+
+    echo "Added ${#chosen[@]} entries to Brewfile under '# Synced additions' — re-file them into the right category whenever convenient."
+}
+
 # Diffs installed Cursor extensions against cursor/extensions.txt, then lets
-# you pick tracked extensions to uninstall (removed from both Cursor and the
-# tracked file). Only called when the `cursor` CLI is present.
+# you pick untracked extensions to add and tracked extensions to uninstall
+# (removed from both Cursor and the tracked file). Only called when the
+# `cursor` CLI is present.
 maintain_cursor_extensions() {
     echo "==> Checking Cursor extension drift..."
     local installed_file tracked_file
@@ -981,13 +1044,28 @@ maintain_cursor_extensions() {
     cursor --list-extensions 2>/dev/null | sort > "$installed_file"
     sort "$DOTFILES_DIR/cursor/extensions.txt" > "$tracked_file"
 
+    local untracked=() missing=()
+    mapfile -t untracked < <(comm -23 "$installed_file" "$tracked_file")
+    mapfile -t missing < <(comm -13 "$installed_file" "$tracked_file")
+    rm -f "$installed_file" "$tracked_file"
+
     echo "--- Installed but not tracked ---"
-    comm -23 "$installed_file" "$tracked_file"
+    printf '%s\n' "${untracked[@]}"
     echo
     echo "--- Tracked but not installed ---"
-    comm -13 "$installed_file" "$tracked_file"
+    printf '%s\n' "${missing[@]}"
     echo
-    rm -f "$installed_file" "$tracked_file"
+
+    if [ "${#untracked[@]}" -gt 0 ]; then
+        local add_args=() ext chosen_add
+        for ext in "${untracked[@]}"; do add_args+=("$ext" ""); done
+        select_checklist "Maintain — Cursor extensions — select to add to extensions.txt" chosen_add all "${add_args[@]}"
+        if [ "${#chosen_add[@]}" -gt 0 ]; then
+            printf '%s\n' "${chosen_add[@]}" >> "$DOTFILES_DIR/cursor/extensions.txt"
+            sort -o "$DOTFILES_DIR/cursor/extensions.txt" "$DOTFILES_DIR/cursor/extensions.txt"
+            echo "Added ${#chosen_add[@]} extensions to cursor/extensions.txt."
+        fi
+    fi
 
     local ext_args=() ext
     while IFS= read -r ext || [ -n "$ext" ]; do
@@ -1023,10 +1101,8 @@ echo "==> Checking for drift between Brewfile and installed state..."
 echo "--- In Brewfile but not installed ---"
 brew bundle check --file="$DOTFILES_DIR/Brewfile" --verbose 2>/dev/null | grep '^→' || echo "  (none)"
 echo
-echo "--- Installed but not in Brewfile ---"
-brew bundle cleanup --file="$DOTFILES_DIR/Brewfile" 2>/dev/null | awk '/^Would `brew cleanup`:/{exit} {print}'
-echo
 
+maintain_brewfile_additions
 maintain_brewfile_removals
 
 if command -v cursor &>/dev/null; then
