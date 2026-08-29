@@ -97,7 +97,6 @@ brew "gum" # common
 cask "vorssaint/tap/vorssaint" # common
 cask "1password" # common
 cask "appcleaner" # common
-cask "asana" # personal
 cask "calibre" # personal
 cask "clipy" # common
 cask "notion" # personal
@@ -124,6 +123,7 @@ cask "monitorcontrol" # common
 
 # AI tools
 cask "claude" # common
+cask "claude-code" # common
 
 # Communication
 cask "slack" # work
