@@ -51,11 +51,24 @@ DBT_PATTERN = re.compile(r"\bdbt\s+(run|build|test|seed)(?=\s|$)", re.I)
 # "&& echo done", "| grep ...") after it.
 AITOOLS_QUERY_PATTERN = re.compile(
     r"databricks\s+experimental\s+aitools\s+tools\s+query\s+"
+    r"(?:-\S+\s+\S+\s+)*"  # skip leading CLI flags (e.g. --profile PROD) and their values
     r"(?:(?P<quote>[\"'])(?P<quoted>.*?)(?P=quote)|(?P<bare>\S+))",
     re.S,
 )
 
 AGGREGATE_SELECT = re.compile(r"^\s*[\"']?\s*select\s+(count|sum|min|max|avg)\b", re.I)
+
+# Commands whose leading verb means the rest of the command is text being
+# inspected/logged, not executed — a mere mention of a blocked pattern (e.g.
+# inside a grep target or a commit message) shouldn't trip the deny checks.
+# Anchored to the start of the command so this can't be smuggled in after a
+# chained dangerous command (e.g. `dbt run && grep x` still gets denied);
+# it does mean a dangerous command chained AFTER an allowlisted leading verb
+# (e.g. `grep x && dbt run`) is not caught by this guard — accepted narrow
+# allowlist, not a full command parser.
+ALLOWLISTED_LEADING_VERBS = re.compile(
+    r"^\s*(?:grep|rg|ag|cat|echo|printf|git\s+commit|git\s+log)\b", re.I
+)
 
 
 def deny(reason: str) -> None:
@@ -104,6 +117,9 @@ def main() -> None:
         return
 
     if ESCAPE_HATCH_PATTERN.match(command):
+        return
+
+    if ALLOWLISTED_LEADING_VERBS.match(command):
         return
 
     for pattern in CLI_PATTERNS:

@@ -45,7 +45,13 @@
       "Bash(git reset --hard:*)",
       "Bash(git clean -f:*)",
       "Bash(git branch -D:*)",
-      "Bash(gh pr merge:*)"
+      "Bash(gh pr merge:*)",
+      "Bash(rtk git push --force:*)",
+      "Bash(rtk git push -f:*)",
+      "Bash(rtk git reset --hard:*)",
+      "Bash(rtk git clean -f:*)",
+      "Bash(rtk git branch -D:*)",
+      "Bash(rtk gh pr merge:*)"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
@@ -95,7 +101,7 @@
         ]
       },
       {
-        "matcher": "startup|clear|compact",
+        "matcher": "startup|clear|compact|resume",
         "hooks": [
           {
             "type": "command",

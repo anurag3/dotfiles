@@ -17,8 +17,8 @@ All DAB mechanics — `databricks.yml` syntax, resource types, variables,
 skill's job. Load it for that. This skill owns only the sequencing and
 confirmation steps around it, driven by defects that have recurred across past
 scaffolds: a reference repo's alert email or "chargeback" variable description
-copied verbatim, an unjustified wheel-artifact decision, and a YAML flow-mapping
-interpolation bug. Catch these before code exists, not during review.
+copied verbatim, and an unjustified wheel-artifact decision. Catch these before
+code exists, not during review.
 
 ## When to Use
 
