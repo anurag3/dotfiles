@@ -20,8 +20,10 @@ or schema/warehouse changes.
 - **Cost at scale** *(🟡 Major)*: unbounded scans with no partition pruning, oversized clusters for the actual workload, small-file explosion amplifying S3/storage request costs — ask "what does this bill at 10x volume?"
 - **Operational readiness** *(🔴 Blocker)*: failure leaves data in a partial or inconsistent state with no safe re-trigger path; no documented recovery steps for likely failure modes; on-call burden increases with no mitigation
 - **Downstream contract impact** *(🟡 Major)*: output schema, column names, file paths, or partition structure consumed by other pipelines, models, or reports changed without auditing consumers — one-line changes cascade silently
+- **Numeric precision / type narrowing** *(🟡 Major)*: decimal-to-double or double-to-decimal conversions, narrowing casts (`bigint`→`int`, `double`→`float`), or precision/scale changes on an existing decimal column — can silently truncate or lose precision in downstream aggregations
 - **Medallion/layering violations** *(🟡 Major)*: raw or landing data written directly to a gold/serving table with no bronze/silver validation or dedup step in between; a mart model querying `source()` directly instead of going through a staging layer
 - **Databricks-specific** *(🔴 Blocker if history-destroying)*: Delta table written with `overwrite` where a `merge`/upsert was needed (destroys history on rerun), no `OPTIMIZE`/Z-ORDER or compaction plan for a table that will accumulate small files, schema evolution (Auto Loader/`mergeSchema`) not handled — schema drift breaks the pipeline silently
+- **`spark_version`/cluster-config drift** *(🟡 Major)*: a bundle's `databricks.yml` or job/pipeline cluster spec has a DBR (`spark_version`), node type, autoscale bounds, or library set that diverges across dev/staging/prod targets with no stated reason, or pins an EOL/soon-to-EOL runtime
 - **Spark scale traps:** wide shuffle (join/groupBy) on skewed keys with no repartitioning, join against a small dimension table with no broadcast hint
 
 ## ML-Specific Traps

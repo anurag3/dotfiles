@@ -103,10 +103,19 @@ two domains/components from the Domain Routing table).
   - Re-verify every 🔴/🟡 finding against the actual diff text yourself  
   before including it. A sub-agent flagging something you're not fully  
   sure of is a signal to check, not a fact to pass through.
+  - If you can't independently verify a sub-agent-sourced finding against  
+  the diff text, keep it but suffix its `Issue` cell with ` (unverified)`  
+  — don't add `(verified)` to the rows you did confirm.
   - Check for cross-slice issues no single slice-scoped agent could see:  
   a shared module changed in one slice and consumed in another, a  
   schema/contract produced in one slice and read in another, logic  
   duplicated across slices.
+  - If a slice renames or drops a column/field that the "Downstream  
+  contract impact" bullet (`references/data-engineering.md`) is concerned  
+  with, run `/cross-repo-search <column-name>` across sibling repos  
+  yourself before finalizing — the slice reviewer can't (no `git`/local-  
+  checkout access) — and fold any hit into the Architectural findings  
+  table.
   - Deduplicate findings raised by more than one slice.
   - Emit exactly one consolidated report in the Output Format below —  
   never return the per-slice tables as-is.
@@ -222,6 +231,10 @@ Severity scale:
 [1–2 sentences. If REQUEST CHANGES, name the specific blockers. If NEEDS DISCUSSION,
 name the open question that must be resolved first.]
 ```
+
+During fan-out reconciliation, suffix `Issue` with ` (unverified)` for a  
+finding you passed through without independently confirming it against the  
+diff text — leave every other row unsuffixed.
 
 ---
 
