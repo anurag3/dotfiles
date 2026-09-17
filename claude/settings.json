@@ -93,6 +93,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/anurag.desai/.claude/hooks/databricks-auth-check.sh'",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
