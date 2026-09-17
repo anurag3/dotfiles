@@ -39,6 +39,14 @@
       "Edit(~/.claude/plans/**)",
       "Bash(defaults read *)"
     ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)",
+      "Bash(git branch -D:*)",
+      "Bash(gh pr merge:*)"
+    ],
     "defaultMode": "auto",
     "additionalDirectories": [
       "~/.claude/plans/"
