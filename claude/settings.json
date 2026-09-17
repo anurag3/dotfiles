@@ -55,6 +55,15 @@
             "command": "/Users/anurag.desai/.claude/hooks/rtk-rewrite.sh"
           }
         ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/anurag.desai/.claude/hooks/plan-file-location-guard.py"
+          }
+        ]
       }
     ],
     "SessionStart": [

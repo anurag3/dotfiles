@@ -18,8 +18,11 @@ def main():
 
     rel = file_path[len(base):]
     parts = rel.split(os.sep)
-    valid = len(parts) >= 3 and re.match(r"^\d{4}-\d{2}-\d{2}-.+", parts[1])
-    if valid:
+    # Nested convention: <repo>/<YYYY-MM-DD>-<desc>/<desc>_plan.md
+    nested = len(parts) >= 3 and re.match(r"^\d{4}-\d{2}-\d{2}-.+", parts[1])
+    # Flat form assigned by Claude Code's own plan-mode harness: plans/<slug>.md
+    flat = len(parts) == 1 and parts[0].endswith(".md")
+    if nested or flat:
         return
 
     reason = (
