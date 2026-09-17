@@ -51,6 +51,11 @@ When your changes create orphans:
 - Remove imports/variables/functions that YOUR changes made unused.
 - Don't remove pre-existing dead code unless asked.
 
+When copying a pattern from a reference repo:
+
+- Strip every repo-specific value (alert emails, team names, variable descriptions, IDs) before applying to the new target.
+- List what was stripped for the user to confirm — don't carry another team's or repo's specifics silently into new code.
+
 The test: Every changed line should trace directly to the user's request.
 
 ## 4. Goal-Driven Execution
@@ -95,3 +100,18 @@ Exception: a single isolated task with no multi-task plan behind it — dispatch
 ## 8. Simplified Technical English
 
 **Before writing any technical documentation, README, procedure, code comment block, or error/UI string, invoke the `simplified-technical-english` skill first — do not rely on description-matching to trigger it.** Applies to file content authored for a human reader; does not apply to your own conversational replies, which follow the `ad-concise` output style instead.
+
+## 9. Databricks Command Confirmation
+
+**Never run a Databricks command — CLI, `dbt` invocations against a Databricks target, SQL against a warehouse, job/pipeline triggers, cluster operations, etc. — without confirming with the user first.** This includes commands that look read-only (`dbt test`, `dbt run`, `databricks bundle validate`) when they execute against a live workspace/warehouse. State the exact command and its target (profile, catalog, schema, warehouse) and wait for explicit approval before executing. Applies on top of any Databricks skill's own guidance.
+
+## 10. Sample Before Querying Databricks Tables
+
+**Before running any non-trivial SQL against a Unity Catalog table (aggregations, multi-column `CASE WHEN` rollups, joins, or anything without a `LIMIT`), first confirm the table's real structure and rough size in the same session — never guess column names from memory or naming conventions.**
+
+1. `databricks experimental aitools tools discover-schema <catalog.schema.table> --profile <PROFILE>` (or `DESCRIBE TABLE`) to get real column names/types.
+2. A cheap probe — `SELECT * FROM <table> LIMIT 10` to see shape and real values. For size, use `DESCRIBE DETAIL <table>` (metadata-only: `numFiles`, `sizeInBytes`) instead of `COUNT(*)` — `COUNT(*)` is metadata-only on a plain Delta table with no filter, but forces a full scan on views, external/non-Delta tables, and streaming tables, so don't use it just to gauge size.
+3. Only then write the full aggregation/join query.
+4. When measuring match rates or coverage between two datasets/tables, use `LEFT JOIN` (not `INNER JOIN`) and count non-null matches — an `INNER JOIN` silently drops every row that didn't match, trivially reporting 100% match regardless of actual coverage.
+
+Skip this only when the columns were already confirmed earlier in the same session. Prefer Genie One (`databricks genie ask`) for data questions in general — it resolves schema/joins itself, sidestepping this class of mistake entirely.
