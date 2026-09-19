@@ -23,7 +23,7 @@ which rtk             # Verify correct binary
 
 ## Hook-Based Usage
 
-All other commands are automatically rewritten by the Claude Code hook.
-Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
-
-Refer to CLAUDE.md for full command reference.
+`ls`, `grep`, `find`, `git`, `gh`, `read`, `wc`, `tree` are auto-rewritten and
+auto-allowed (see `claude/settings.json`). Other rtk subcommands (docker,
+kubectl, aws, pnpm, psql, dotnet, ...) are still rewritten by the hook but
+will prompt for permission unless added to the allow list.

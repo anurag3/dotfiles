@@ -91,21 +91,21 @@
     ],
     "SessionStart": [
       {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/anurag.desai/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "startup|clear|compact|resume",
         "hooks": [
           {
             "type": "command",
             "command": "bash '/Users/anurag.desai/.claude/hooks/databricks-auth-check.sh'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/anurag.desai/.claude/hooks/herdr-agent-state.sh' session",
             "timeout": 10
           }
         ]
@@ -126,7 +126,8 @@
     "explanatory-output-style@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
     "i-have-adhd@i-have-adhd": true,
-    "databricks@claude-plugins-official": true
+    "databricks@claude-plugins-official": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "i-have-adhd": {

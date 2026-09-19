@@ -109,9 +109,18 @@ Exception: a single isolated task with no multi-task plan behind it — dispatch
 
 **Before running any non-trivial SQL against a Unity Catalog table (aggregations, multi-column `CASE WHEN` rollups, joins, or anything without a `LIMIT`), first confirm the table's real structure and rough size in the same session — never guess column names from memory or naming conventions.**
 
-1. `databricks experimental aitools tools discover-schema <catalog.schema.table> --profile <PROFILE>` (or `DESCRIBE TABLE`) to get real column names/types.
-2. A cheap probe — `SELECT * FROM <table> LIMIT 10` to see shape and real values. For size, use `DESCRIBE DETAIL <table>` (metadata-only: `numFiles`, `sizeInBytes`) instead of `COUNT(*)` — `COUNT(*)` is metadata-only on a plain Delta table with no filter, but forces a full scan on views, external/non-Delta tables, and streaming tables, so don't use it just to gauge size.
+1. `databricks experimental aitools tools discover-schema <catalog.schema.table> --profile <PROFILE>` — one call returns real column names/types, 5 sample rows, null counts, and total row count. Fall back to `DESCRIBE TABLE` plus a manual `SELECT * FROM <table> LIMIT 10` only if discover-schema isn't available.
+2. For file/storage size specifically (`numFiles`, `sizeInBytes`, not returned by discover-schema), use `DESCRIBE DETAIL <table>` instead of `COUNT(*)` — `COUNT(*)` is metadata-only on a plain Delta table with no filter, but forces a full scan on views, external/non-Delta tables, and streaming tables.
 3. Only then write the full aggregation/join query.
 4. When measuring match rates or coverage between two datasets/tables, use `LEFT JOIN` (not `INNER JOIN`) and count non-null matches — an `INNER JOIN` silently drops every row that didn't match, trivially reporting 100% match regardless of actual coverage.
 
 Skip this only when the columns were already confirmed earlier in the same session. Prefer Genie One (`databricks genie ask`) for data questions in general — it resolves schema/joins itself, sidestepping this class of mistake entirely.
+
+## 11. Conventional Commits
+
+**Every git commit message and every branch name MUST follow Conventional Commits style — no exceptions, and never a skill name in either.**
+
+- Commit message subject: `<type>: <description>`, e.g. `fix: correct null check in foo()`.
+- Branch name: `<type>/<description>`, e.g. `fix/null-check-in-foo`, kebab-case description.
+- `<type>` is one of `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `ci`, `build` — picked from the actual nature of the change (new capability → `feat`, bug fix → `fix`, cleanup/deps/tooling → `chore`, docs-only → `docs`, no-behavior-change restructuring → `refactor`, test-only → `test`).
+- Never put a skill name (e.g. `ponytail`, `ponytail-audit`) in a branch name, commit message, or PR title/description — name them after what the change does, not the skill that produced it.
