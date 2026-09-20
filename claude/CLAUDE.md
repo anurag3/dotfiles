@@ -116,7 +116,11 @@ Exception: a single isolated task with no multi-task plan behind it — dispatch
 
 Skip this only when the columns were already confirmed earlier in the same session. Prefer Genie One (`databricks genie ask`) for data questions in general — it resolves schema/joins itself, sidestepping this class of mistake entirely.
 
-## 11. Conventional Commits
+## 11. Reviewer Agents Use sam-review
+
+**Whenever an agent is dispatched to review code — a PR, a local diff, or a branch — instruct it to follow the `sam-review` skill's workflow, not an ad-hoc review or the generic `code-review` skill.** Applies whether or not a PR URL is present; when there is no PR URL, the dispatched agent adapts `sam-review`'s checklist (data pipelines, infra, ML, backend/API coverage) to the local diff instead of a PR page. State this instruction explicitly in the dispatch prompt, since a fresh agent has no memory of this rule.
+
+## 12. Conventional Commits
 
 **Every git commit message and every branch name MUST follow Conventional Commits style — no exceptions, and never a skill name in either.**
 

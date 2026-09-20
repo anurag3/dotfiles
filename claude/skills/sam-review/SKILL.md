@@ -1,14 +1,16 @@
 ---
 name: sam-review
 description: >
-  Use when the user asks to review a pull request AND supplies a PR URL
-  (e.g. "review this PR <link>", "is this PR safe to merge <link>") —
+  Use when the user asks to review code changes — a pull request with a PR
+  URL (e.g. "review this PR <link>", "is this PR safe to merge <link>"), or
+  a local diff/branch with no PR URL (e.g. "review this diff", "review my
+  branch"), including when a reviewer agent is dispatched to review code —
   covers data pipelines (ETL/ELT, dbt, Spark, Airflow, SQL, schema
   migrations), infrastructure (Terraform, Helm, Kubernetes, CI/CD), ML, and
-  backend/API code. Requires an explicit PR link in the request.
+  backend/API code.
 ---
 
-# PR Review
+# Code Review
 
 Review as a Principal Engineer: direct, thorough, and willing to block a  
 merge when something is genuinely wrong. Explain **why** something is a  
@@ -16,12 +18,21 @@ problem, not just that it is one — and call out what's done well.
 
 ## Usage
 
+Pull request:
 ```
 review this PR <PR URL>
 ```
 
-Fetch the diff yourself once you have the link (works from any directory —  
-`gh` resolves the repo from the URL):
+Local diff or branch, no PR URL:
+```
+review this diff
+review my branch
+review branch <name>
+```
+
+Fetch the diff yourself before reviewing.
+
+**PR URL given** (works from any directory — `gh` resolves the repo from the URL):
 
 ```bash
 gh pr view <PR URL> --json title,body,files,additions,deletions,commits
@@ -32,11 +43,23 @@ The PR's branch is usually not checked out locally — the working tree is most 
 on the base branch (e.g. `develop`/`main`), which may lack the file entirely or hold
 an older version of it. Derive every `Location` (`file.py:42`) citation from the diff
 file's own hunk headers (`@@ -a,b +c,d @@`), not from grepping or reading the file in
-the local working tree — that's the same local-checkout trap the Large PR Fan-Out
+the local working tree — that's the same local-checkout trap the Large Diff Fan-Out
 Protocol guards sub-agents against, and it applies just as much to a direct review.
 Only read local files to pull in context the diff itself doesn't show (e.g. an
 unchanged helper the diff calls into) — and even then, confirm via the diff that the
 surrounding code is unchanged before trusting the local version's line numbers.
+
+**No PR URL (local diff or branch):**
+
+```bash
+git diff > /tmp/review-local.diff                            # uncommitted changes
+git diff <base-branch>...<branch-name> > /tmp/review-local.diff  # branch vs. its base
+```
+
+Here the working tree usually *is* the branch under review, so reading the local file
+directly for context is safe — confirm with `git status`/`git branch --show-current`
+which branch you're actually on first. The diff-file line-number trap below still
+applies whenever you cite a `Location` from the `.diff` file itself.
 
 **Common failure mode:** when you `Read` the `.diff` file, the tool prefixes every line
 with its own line number *within that diff file* (patch email headers, `From ...`,
@@ -72,9 +95,10 @@ below.
 
 ---
 
-## Large PR Fan-Out Protocol
+## Large Diff Fan-Out Protocol
 
-For a small/medium diff, review it directly — do not spawn sub-agents.
+For a small/medium diff, review it directly — do not spawn sub-agents.  
+Applies the same way whether the diff came from a PR or a local diff/branch.
 
 Fan out only when a single pass would blur attention across unrelated  
 components (rule of thumb: >500 changed lines, or files spanning more than  
@@ -84,15 +108,15 @@ two domains/components from the Domain Routing table).
   coherent slices (e.g. "CI/CD + deploy config", "core resolver logic",  
    "new utils package + its tests") — each slice should be reviewable on  
    its own without missing shared context. Write each slice to its own  
-   diff file (`/tmp/pr<number>_<slice>.diff`). This grouping is  
-   pattern-matching against the Domain Routing table — do it yourself, it  
-   doesn't need a model call.
+   diff file (`/tmp/pr<number>_<slice>.diff` for a PR, `/tmp/review-local_<slice>.diff`  
+   for a local diff/branch). This grouping is pattern-matching against the  
+   Domain Routing table — do it yourself, it doesn't need a model call.
 2. **Dispatch one `pr-slice-reviewer` sub-agent per slice, in parallel** —
   not `general-purpose`. It's scoped to read only the diff file it's  
    given (no `git diff`/`git show`/local-checkout access), which avoids a  
    failure mode general-purpose agents hit: reading the local checkout  
-   instead of the PR branch and reporting findings that don't exist on the  
-   branch. Give each agent:
+   instead of the reviewed branch and reporting findings that don't exist on  
+   it. Give each agent:
   - The path to its diff file.
   - The path to the relevant `references/<domain>.md` file(s) — point at  
   the file, don't paste the checklist inline.
@@ -137,7 +161,7 @@ delegated to another agent.
 ## Review Checklist
 
 Work through all three areas for every review. Do not skip a category because  
-the PR looks small — subtle issues often hide in small changes.
+the diff looks small — subtle issues often hide in small changes.
 
 ### 🔴 Pain Points (Obvious Issues)
 
