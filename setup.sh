@@ -660,6 +660,11 @@ ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-co
 [ -d "$DOTFILES_DIR/claude/skills" ] && \
     rm -rf "$HOME/.claude/skills" && \
     ln -sf "$DOTFILES_DIR/claude/skills"  "$HOME/.claude/skills"
+[ -d "$DOTFILES_DIR/claude/agents" ] && \
+    rm -rf "$HOME/.claude/agents" && \
+    ln -sf "$DOTFILES_DIR/claude/agents"  "$HOME/.claude/agents"
+mkdir -p "$HOME/.claude/output-styles"
+ln -sf "$DOTFILES_DIR/claude/output-styles/ad-concise.md" "$HOME/.claude/output-styles/ad-concise.md"
 }
 
 ###############################################################################

@@ -93,6 +93,8 @@ Exception: a single isolated task with no multi-task plan behind it — dispatch
 
 `<repo>` = repo name from `git remote get-url origin` (last path segment, strip `.git`), else `basename "$PWD"`. `<description>` = 2-5 word kebab-case summary (e.g. `add-auth-middleware`). `mkdir -p` the directory before writing. Applies regardless of trigger — brainstorming's "write design doc" step, the writing-plans skill, plan mode, or a direct request to draft one.
 
+These paths are for local use only — never put them in a commit message or PR body (rule 13).
+
 ## 7. Worktree Policy
 
 **Never create a git worktree for isolation — via `superpowers:using-git-worktrees`, `subagent-driven-development`'s Setup step, or any other skill — unless the user explicitly asks for one; work directly in the current workspace/branch by default.**
@@ -128,3 +130,12 @@ Skip this only when the columns were already confirmed earlier in the same sessi
 - Branch name: `<type>/<description>`, e.g. `fix/null-check-in-foo`, kebab-case description.
 - `<type>` is one of `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `ci`, `build` — picked from the actual nature of the change (new capability → `feat`, bug fix → `fix`, cleanup/deps/tooling → `chore`, docs-only → `docs`, no-behavior-change restructuring → `refactor`, test-only → `test`).
 - Never put a skill name (e.g. `ponytail`, `ponytail-audit`) in a branch name, commit message, or PR title/description — name them after what the change does, not the skill that produced it.
+
+## 13. Commit/PR Content: No Attribution, No Internal Artifacts
+
+**A git commit message and a PR description must state only what the change does — nothing about how it was produced. Applies to both surfaces equally, across every repo.**
+
+- Never append "🤖 Generated with Claude Code" or any similar AI-attribution line, byline, or footer, to a commit message or PR body — regardless of any tool default that suggests one.
+- Never reference internal planning artifacts: no paths to the rule 6 spec/plan locations (`~/.claude/plans/...`, `~/.claude/specs/...`), no mentions of "the plan," no ledger/task/round bookkeeping language (e.g. "Task 3", "fix round 1", "per the plan"). This is in addition to the skill-name ban in rule 12.
+- Before opening a PR, spot-check `git log <base>..<branch>` for any commit that already slipped one of these in — commits are often written earlier in a session, before this rule is top of mind.
+- A commit/PR body should read like a summary + test plan (what changed, why, how it was verified) — not a narration of the session that produced it.
