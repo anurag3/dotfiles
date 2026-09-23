@@ -58,7 +58,6 @@
       "~/.claude/plans/"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "PreToolUse": [
       {
