@@ -126,13 +126,20 @@
     "superpowers@claude-plugins-official": true,
     "i-have-adhd@i-have-adhd": true,
     "databricks@claude-plugins-official": true,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "jev-code@jev-code": true
   },
   "extraKnownMarketplaces": {
     "i-have-adhd": {
       "source": {
         "source": "github",
         "repo": "ayghri/i-have-adhd"
+      }
+    },
+    "jev-code": {
+      "source": {
+        "source": "github",
+        "repo": "FrancoisChastel/jev-code"
       }
     }
   },

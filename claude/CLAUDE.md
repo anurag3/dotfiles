@@ -80,9 +80,24 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## 5. Plan Execution Approach
 
-**Default to subagent-driven development (`superpowers:subagent-driven-development`) for executing multi-task plans — skip the "Execution Handoff" choice prompt in `superpowers:writing-plans` and just proceed.**
+**Execute multi-task plans in parallel waves of `implementer` subagents. Do not use `superpowers:subagent-driven-development` or `superpowers:executing-plans`. Skip the "Execution Handoff" choice prompt in `superpowers:writing-plans` and proceed.**
 
-Exception: a single isolated task with no multi-task plan behind it — dispatch a subagent directly via the Agent tool instead. The skill's ledger, review gate, and fix-loop exist to survive a long unattended multi-task run; for one task there's nothing for them to coordinate. Otherwise, only deviate if the user explicitly asks for inline execution or another approach.
+Plan format (add to every plan that `superpowers:writing-plans` or plan mode writes):
+
+- Each task has a `Files:` list of every file that the task creates or changes.
+- Each task has a `Depends on:` line with task numbers, or `none`.
+
+Execution procedure:
+
+1. Put the tasks into waves. A wave contains tasks whose dependencies are complete and whose `Files:` lists do not overlap.
+2. If two ready tasks share a file, put them in different waves.
+3. Dispatch all `implementer` agents of a wave in one message, so that they run in parallel. Give each agent its task text, its `Files:` list, and the interfaces from earlier tasks.
+4. After the wave, run the full test suite. Review the wave diff with a reviewer agent that follows `sam-review` (rule 11).
+5. For each finding, resume the implementer that owns the file (`SendMessage`). Stop after 3 fix rounds for each task and ask the user.
+6. Commit each task separately (rule 12). Then append `Task <N>: complete (<sha>)` to a `progress.md` file next to the plan.
+7. After compaction, read `progress.md` and `git log` before you dispatch. Do not dispatch a task again if it is complete.
+
+Exception: for a single task with no plan, dispatch one `implementer` directly. Only deviate if the user explicitly asks for inline execution or another approach.
 
 ## 6. Spec & Plan File Location
 

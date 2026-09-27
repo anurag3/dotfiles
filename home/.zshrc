@@ -140,7 +140,7 @@ alias ll="ls -lath"
 alias zshconfig="cursor ~/.zshrc"
 alias cc="claude"
 alias cw="claude-workspace"
-alias cx="cursor ."
+alias cx="code ."
 alias plans="cursor ~/.claude/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
