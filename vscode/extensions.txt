@@ -1,3 +1,4 @@
+alssys.interactive-scala
 andrewgross.databricks-notebook
 anthropic.claude-code
 concretio.markdown-for-humans
@@ -29,6 +30,7 @@ redhat.java
 redhat.vscode-yaml
 renesaarsoo.sql-formatter-vsc
 scala-lang.scala
+scala-lang.scala-snippets
 scalameta.metals
 vscjava.vscode-gradle
 vscjava.vscode-java-debug
