@@ -10,6 +10,7 @@ sidebar_start_collapsed = false     # keep the workspace list visible across man
 confirm_close = true                # don't kill a running agent pane by accident
 prompt_new_workspace_name = false   # auto-name workspaces instead of prompting
 
+status_indicators = "symbols"
 [ui.toast]
 delivery = "terminal"
 delay_seconds = 1
