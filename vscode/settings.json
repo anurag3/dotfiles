@@ -89,5 +89,9 @@
         "**/.forgejo/workflows/*.yaml"
     ],
     "editor.minimap.enabled": true,
-    "git.openRepositoryInParentFolders": "always"
+    "git.openRepositoryInParentFolders": "always",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.secondarySideBar.showLabels": false,
+    "workbench.startupEditor": "none",
+    "python.analysis.typeCheckingMode": "standard"
 }
