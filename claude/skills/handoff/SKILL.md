@@ -4,12 +4,22 @@ description: >
   Writes a handoff markdown note with completed work, in-progress items and their status-check
   commands, next steps, and auth state to refresh, so a later session can resume. Use when the
   user asks for a handoff note, asks to wrap up, pause, or end the session, or invokes /handoff.
+allowed-tools: Bash(git rev-parse *) Bash(git branch *) Bash(git status *) Bash(git log *) Bash(echo *)
 ---
 
 # Handoff
 
 Author a single markdown file capturing where this session stands, so the next session (yours
 or someone else's) can resume without re-discovering what happened.
+
+## Current state
+
+The block below shows the branch, `git status --short`, and `git log --oneline -10`. It shows
+"Not a git repository." when the working directory is not in a git repository.
+
+```!
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 && { git branch --show-current; git status --short; git log --oneline -10 2>/dev/null || echo "No commits yet."; } || echo "Not a git repository."
+```
 
 ## Where to write it
 
@@ -21,7 +31,8 @@ ask the user where to write it.
 
 Derive the draft from actual session state — don't ask the user to dictate it from scratch:
 
-- `git status` and `git log` (recent commits, uncommitted/staged changes, current branch)
+- The git state in "Current state" above. Run git commands only for detail that it does not
+  show, for example a diff or commits older than the last 10.
 - Commands run this session, especially any still running or left unresolved (a query, a
   rebase, a long job)
 - The active todo list, if one exists, for completed vs. outstanding items
