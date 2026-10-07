@@ -87,15 +87,7 @@ Plan format (add to every plan that `superpowers:writing-plans` or plan mode wri
 - Each task has a `Files:` list of every file that the task creates or changes.
 - Each task has a `Depends on:` line with task numbers, or `none`.
 
-Execution procedure:
-
-1. Put the tasks into waves. A wave contains tasks whose dependencies are complete and whose `Files:` lists do not overlap.
-2. If two ready tasks share a file, put them in different waves.
-3. Dispatch all `implementer` agents of a wave in one message, so that they run in parallel. Give each agent its task text, its `Files:` list, and the interfaces from earlier tasks.
-4. After the wave, run the full test suite. Review the wave diff with a reviewer agent that follows `sam-review` (rule 11).
-5. For each finding, resume the implementer that owns the file (`SendMessage`). Stop after 3 fix rounds for each task and ask the user.
-6. Commit each task separately (rule 12). Then append `Task <N>: complete (<sha>)` to a `progress.md` file next to the plan.
-7. After compaction, read `progress.md` and `git log` before you dispatch. Do not dispatch a task again if it is complete.
+To execute or resume a plan, including after compaction, invoke the `executing-plans-in-waves` skill first.
 
 Exception: for a single task with no plan, dispatch one `implementer` directly. Only deviate if the user explicitly asks for inline execution or another approach.
 
@@ -132,12 +124,7 @@ File content combines all three, with this precedence:
 
 **Before running any non-trivial SQL against a Unity Catalog table (aggregations, multi-column `CASE WHEN` rollups, joins, or anything without a `LIMIT`), first confirm the table's real structure and rough size in the same session — never guess column names from memory or naming conventions.**
 
-1. `databricks experimental aitools tools discover-schema <catalog.schema.table> --profile <PROFILE>` — one call returns real column names/types, 5 sample rows, null counts, and total row count. Fall back to `DESCRIBE TABLE` plus a manual `SELECT * FROM <table> LIMIT 10` only if discover-schema isn't available.
-2. For file/storage size specifically (`numFiles`, `sizeInBytes`, not returned by discover-schema), use `DESCRIBE DETAIL <table>` instead of `COUNT(*)` — `COUNT(*)` is metadata-only on a plain Delta table with no filter, but forces a full scan on views, external/non-Delta tables, and streaming tables.
-3. Only then write the full aggregation/join query.
-4. When measuring match rates or coverage between two datasets/tables, use `LEFT JOIN` (not `INNER JOIN`) and count non-null matches — an `INNER JOIN` silently drops every row that didn't match, trivially reporting 100% match regardless of actual coverage.
-
-Skip this only when the columns were already confirmed earlier in the same session. Prefer Genie One (`databricks genie ask`) for data questions in general — it resolves schema/joins itself, sidestepping this class of mistake entirely.
+Invoke the `sampling-databricks-tables` skill first. Prefer Genie One (`databricks genie ask`) for data questions in general.
 
 ## 11. Reviewer Agents Use sam-review
 

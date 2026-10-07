@@ -150,7 +150,8 @@ def main() -> None:
             "plain aggregate. Confirm the table's structure first "
             "(discover-schema / DESCRIBE TABLE), then sample with SELECT * "
             "... LIMIT 10 (CLAUDE.md rule 10: Sample Before Querying "
-            f"Databricks Tables). If already approved, re-run with "
+            "Databricks Tables). Invoke the sampling-databricks-tables "
+            f"skill first. If already approved, re-run with "
             f"{ESCAPE_HATCH} prefixed to the command."
         )
 
