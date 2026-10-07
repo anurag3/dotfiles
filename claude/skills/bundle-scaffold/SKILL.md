@@ -1,11 +1,12 @@
 ---
 name: bundle-scaffold
 description: >
-  Use when the user asks to scaffold or create a new Databricks Asset Bundle
-  (DAB) — either from an existing reference repo (e.g. "scaffold a bundle
-  like lrad for domain-enrichment-service") or from scratch. Org-standard
-  sequencing layered on top of the vendored `databricks-dabs` skill, not a
-  replacement for it.
+  Scaffolds a new Databricks Asset Bundle (DAB) with org-standard sequencing:
+  strips repo-specific values from a reference repo, confirms targets and
+  artifacts with the user, then validates without deploying. Layers on top of
+  the databricks-dabs skill. Use when the user asks to scaffold or create a new
+  DAB, from a reference repo (e.g. "scaffold a bundle like lrad for
+  domain-enrichment-service") or from scratch.
 ---
 
 # Bundle Scaffold

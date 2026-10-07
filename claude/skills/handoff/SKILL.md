@@ -1,17 +1,15 @@
 ---
 name: handoff
 description: >
-  Write a handoff note summarizing the current session's state before pausing or ending it.
-  Use when the user asks for a handoff note, asks to wrap up/pause/end the session, or
-  explicitly invokes /handoff.
+  Writes a handoff markdown note with completed work, in-progress items and their status-check
+  commands, next steps, and auth state to refresh, so a later session can resume. Use when the
+  user asks for a handoff note, asks to wrap up, pause, or end the session, or invokes /handoff.
 ---
 
 # Handoff
 
 Author a single markdown file capturing where this session stands, so the next session (yours
-or someone else's) can resume without re-discovering what happened. This is the authoring
-counterpart to `session-resume` — that skill recovers from a crashed session's JSONL; this one
-writes the note in the first place. Don't duplicate its recovery logic here.
+or someone else's) can resume without re-discovering what happened.
 
 ## Where to write it
 
@@ -52,4 +50,3 @@ Write exactly these four sections, in this order:
   process.
 - Do not touch auto-memory.
 - Do not create a git commit — the user decides whether to commit the handoff file.
-- Do not attempt to automate resumption; that's `session-resume`'s job, not this skill's.

@@ -1,8 +1,8 @@
 ---
 name: sync-workspace-repos
 description: >
-  Switch all Claude Code workspace repositories to the main branch and pull the latest changes.
-  Use whenever the user says "sync repos", "sync workspace", "pull latest", "switch to main",
+  Switches every Claude Code workspace repository to its main (or master) branch and pulls the
+  latest changes, and reports each repo it cannot sync. Use whenever the user says "sync repos", "sync workspace", "pull latest", "switch to main",
   "update all repos", "get latest changes", "refresh repos", "update my repos", or any variation
   of wanting to sync, update, or switch multiple repositories in the workspace to their main branch.
   Also trigger when the user is starting work on a new task and mentions wanting fresh code.
