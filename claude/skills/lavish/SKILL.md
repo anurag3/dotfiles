@@ -1,7 +1,8 @@
 ---
 name: lavish
-description: Builds an HTML review page with the lavish-axi CLI, opens it in the browser for the user to annotate, then polls for and applies their feedback. Use only when the user asks for lavish, invokes /lavish, or asks for a browser review loop with annotations. For a plain visual page, use the Artifact tool instead.
+description: Builds an HTML review page with the lavish-axi CLI, opens it in the browser for the user to annotate, then polls for and applies their feedback. Invoke with /lavish. For a plain visual page, use the Artifact tool instead.
 argument-hint: <what the artifact should show>
+disable-model-invocation: true
 author: Kun Chen (kunchenguid)
 metadata:
   hermes:
