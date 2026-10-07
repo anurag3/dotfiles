@@ -1,6 +1,6 @@
 ---
 name: adhd-format
-description: Shape output for a reader with ADHD - lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Auto-invoke whenever the user mentions ADHD, focus issues, or asks for this kind of output shape; also invocable via /adhd-format. Stays on until "stop adhd mode".
+description: 'Shapes replies for a reader with ADHD: next action first, numbered steps, restated progress, concrete time estimates, visible wins. The ad-concise output style already applies these rules. Use when the user mentions ADHD or focus problems, asks for this output shape, invokes /adhd-format, or when an output style other than ad-concise is active. Stays on until "stop adhd mode".'
 license: MIT
 metadata:
   tags: "ADHD, Output Style, Productivity, Formatting"

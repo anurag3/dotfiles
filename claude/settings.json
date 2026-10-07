@@ -121,11 +121,11 @@
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": false,
+    "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
-    "i-have-adhd@i-have-adhd": true,
+    "i-have-adhd@i-have-adhd": false,
     "databricks@claude-plugins-official": true,
     "ponytail@ponytail": true,
     "jev-code@jev-code": true

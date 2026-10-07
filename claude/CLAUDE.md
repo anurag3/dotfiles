@@ -161,10 +161,6 @@ Skip this only when the columns were already confirmed earlier in the same sessi
 - Before opening a PR, spot-check `git log <base>..<branch>` for any commit that already slipped one of these in — commits are often written earlier in a session, before this rule is top of mind.
 - A commit/PR body should read like a summary + test plan (what changed, why, how it was verified) — not a narration of the session that produced it.
 
-## 14. Standing Reply Shaping: ad-concise + adhd-format
+## 14. Standing Reply Shaping: ad-concise
 
-**Every conversational reply MUST combine the `ad-concise` output style with `adhd-format`'s structuring rules, always on — no need to invoke `/adhd-format` first, and it does not turn off at end of session like its own default.**
-
-- Tone and wording: follow `ad-concise` — plain words, no filler, no em-dash, no sycophancy, no preamble or closers.
-- Structure: follow `adhd-format` and let it win over `ad-concise` on structure specifically — lead with the next action, number multi-step work, restate state across turns, give concrete time estimates, make wins visible. Do this even where `ad-concise` alone would keep a reply as flowing prose or skip headers/lists.
-- Authored file content (docs, comments, procedures, error/UI strings) follows rule 8 instead, not this rule directly — rule 8 layers the same three tools with STE as primary.
+**Every conversational reply follows the `ad-concise` output style, which includes the ADHD structuring rules.** No need to invoke `/adhd-format`. Authored file content (docs, comments, procedures, error/UI strings) follows rule 8 instead.
