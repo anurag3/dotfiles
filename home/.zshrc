@@ -108,9 +108,10 @@ jar_upload(){
   echo "txt cp Done"
 }
 
-function cursor {
-  open -a "/Applications/Cursor.app" "$@"
-}
+# Test - Decomission Cursor
+# function cursor {
+#   open -a "/Applications/Cursor.app" "$@"
+# }
 
 
 # User configuration
@@ -137,11 +138,11 @@ function cursor {
 #
 # Example aliases
 alias ll="ls -lath"
-alias zshconfig="cursor ~/.zshrc"
+alias zshconfig="code ~/.zshrc"
 alias cc="claude"
 alias cw="claude-workspace"
 alias cx="code ."
-alias plans="cursor ~/.claude/"
+alias plans="code ~/.claude/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
