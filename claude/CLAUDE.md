@@ -104,9 +104,9 @@ These paths are for local use only — never put them in a commit message or PR 
 
 ## 7. Worktree Policy
 
-**Never create a git worktree for isolation — via `superpowers:using-git-worktrees`, `subagent-driven-development`'s Setup step, or any other skill — unless the user explicitly asks for one; work directly in the current workspace/branch by default.**
+**Never create a git worktree for isolation — via `superpowers:using-git-worktrees`, `subagent-driven-development`'s Setup step, or any other skill — unless the user explicitly asks for one; work directly in the current workspace/branch by default.** A deny rule in `settings.json` blocks `git worktree add` and `EnterWorktree`.
 
-## 8. Simplified Technical English + ad-concise + adhd-format for File Content
+## 8. Simplified Technical English + ad-concise + ad-concise's ADHD structure rules for File Content
 
 **Before writing any technical documentation, README, procedure, code comment block, or error/UI string, invoke the `simplified-technical-english` skill first — do not rely on description-matching to trigger it.** Applies to file content authored for a human reader; conversational replies instead follow rule 14.
 
@@ -114,7 +114,7 @@ File content combines all three, with this precedence:
 
 - **STE is primary.** Controlled-language rules (approved word list, grammar, sentence structure) come from `simplified-technical-english`.
 - **ad-concise fills the gaps.** Where STE is silent, apply `ad-concise`'s tone rules: no em-dash, no filler words, no sycophancy, no LLM-isms.
-- **adhd-format shapes structure**, in every authored file including code comments: lead with the point, number multi-step procedures, make the actionable part visible first. This does not override the existing no-comments-unless-WHY rule — it governs style when a comment is written, not whether to write one.
+- **ad-concise's ADHD structure rules shape structure**, in every authored file including code comments: lead with the point, number multi-step procedures, make the actionable part visible first. This does not override the existing no-comments-unless-WHY rule — it governs style when a comment is written, not whether to write one.
 
 ## 9. Databricks Command Confirmation
 
@@ -137,15 +137,15 @@ Invoke the `sampling-databricks-tables` skill first. Prefer Genie One (`databric
 - Commit message subject: `<type>: <description>`, e.g. `fix: correct null check in foo()`.
 - Branch name: `<type>/<description>`, e.g. `fix/null-check-in-foo`, kebab-case description.
 - `<type>` is one of `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `ci`, `build` — picked from the actual nature of the change (new capability → `feat`, bug fix → `fix`, cleanup/deps/tooling → `chore`, docs-only → `docs`, no-behavior-change restructuring → `refactor`, test-only → `test`).
-- Never put a skill name (e.g. `ponytail`, `ponytail-audit`) in a branch name, commit message, or PR title/description — name them after what the change does, not the skill that produced it.
+- `hooks/git-convention-guard.py` blocks commits, branches, and PRs that do not obey this rule.
 
 ## 13. Commit/PR Content: No Attribution, No Internal Artifacts
 
 **A git commit message and a PR description must state only what the change does — nothing about how it was produced. Applies to both surfaces equally, across every repo.**
 
-- Never append "🤖 Generated with Claude Code" or any similar AI-attribution line, byline, or footer, to a commit message or PR body — regardless of any tool default that suggests one.
-- Never reference internal planning artifacts: no paths to the rule 6 spec/plan locations (`~/.claude/plans/...`, `~/.claude/specs/...`), no mentions of "the plan," no ledger/task/round bookkeeping language (e.g. "Task 3", "fix round 1", "per the plan"). This is in addition to the skill-name ban in rule 12.
-- Before opening a PR, spot-check `git log <base>..<branch>` for any commit that already slipped one of these in — commits are often written earlier in a session, before this rule is top of mind.
+- Banned: AI-attribution lines or footers, rule 6 spec/plan paths, and task/round bookkeeping ("Task 3", "fix round 1", "per the plan").
+- `hooks/git-convention-guard.py` blocks commits, branches, and PRs that do not obey this rule.
+- Before opening a PR, spot-check `git log <base>..<branch>` for any commit that does not obey rules 12 and 13. The hook does not check commits that existed before it.
 - A commit/PR body should read like a summary + test plan (what changed, why, how it was verified) — not a narration of the session that produced it.
 
 ## 14. Standing Reply Shaping: ad-concise

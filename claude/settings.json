@@ -51,7 +51,10 @@
       "Bash(rtk git reset --hard:*)",
       "Bash(rtk git clean -f:*)",
       "Bash(rtk git branch -D:*)",
-      "Bash(rtk gh pr merge:*)"
+      "Bash(rtk gh pr merge:*)",
+      "Bash(git worktree add:*)",
+      "Bash(rtk git worktree add:*)",
+      "EnterWorktree"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
@@ -75,6 +78,15 @@
           {
             "type": "command",
             "command": "/Users/anurag.desai/.claude/hooks/databricks-guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/anurag.desai/.claude/hooks/git-convention-guard.py"
           }
         ]
       },
