@@ -1,6 +1,6 @@
 ---
 name: pr-slice-reviewer
-description: Reviews one file/domain-scoped slice of a larger PR diff as a Principal Engineer. Dispatched by the sam-review skill's Large PR Fan-Out Protocol when a diff is split into slices — not a general-purpose or standalone review agent.
+description: Reviews one file/domain-scoped slice of a larger PR diff as a Principal Engineer. Dispatched by the sam-review skill's Large Diff Fan-Out Protocol when a diff is split into slices — not a general-purpose or standalone review agent.
 tools: Read, Grep, Glob
 model: inherit
 color: red

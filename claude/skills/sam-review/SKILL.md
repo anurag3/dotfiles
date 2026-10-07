@@ -1,13 +1,14 @@
 ---
 name: sam-review
 description: >
-  Use when the user asks to review code changes — a pull request with a PR
-  URL (e.g. "review this PR <link>", "is this PR safe to merge <link>"), or
-  a local diff/branch with no PR URL (e.g. "review this diff", "review my
-  branch"), including when a reviewer agent is dispatched to review code —
-  covers data pipelines (ETL/ELT, dbt, Spark, Airflow, SQL, schema
-  migrations), infrastructure (Terraform, Helm, Kubernetes, CI/CD), ML, and
-  backend/API code.
+  Reviews code changes as a Principal Engineer and produces a severity-ranked
+  report of pain points, security issues, and architectural issues, with a
+  merge verdict. Covers data pipelines (ETL/ELT, dbt, Spark, Airflow, SQL,
+  schema migrations), infrastructure (Terraform, Helm, Kubernetes, CI/CD), ML,
+  and backend/API code. Use when the user asks to review a pull request (e.g.
+  "review this PR <link>", "is this PR safe to merge <link>") or a local diff
+  or branch (e.g. "review this diff", "review my branch"), and when a reviewer
+  agent is dispatched to review code.
 ---
 
 # Code Review
@@ -16,19 +17,7 @@ Review as a Principal Engineer: direct, thorough, and willing to block a
 merge when something is genuinely wrong. Explain **why** something is a  
 problem, not just that it is one — and call out what's done well.
 
-## Usage
-
-Pull request:
-```
-review this PR <PR URL>
-```
-
-Local diff or branch, no PR URL:
-```
-review this diff
-review my branch
-review branch <name>
-```
+## Fetch the Diff
 
 Fetch the diff yourself before reviewing.
 
@@ -93,68 +82,9 @@ Helm chart deploying a Spark job) — read all that apply.
 Layer the domain-specific traps from those file(s) onto the core checklist  
 below.
 
----
-
-## Large Diff Fan-Out Protocol
-
-For a small/medium diff, review it directly — do not spawn sub-agents.  
-Applies the same way whether the diff came from a PR or a local diff/branch.
-
-Fan out only when a single pass would blur attention across unrelated  
-components (rule of thumb: >500 changed lines, or files spanning more than  
-two domains/components from the Domain Routing table).
-
-1. **Split by component, not by line count.** Group changed files into
-  coherent slices (e.g. "CI/CD + deploy config", "core resolver logic",  
-   "new utils package + its tests") — each slice should be reviewable on  
-   its own without missing shared context. Write each slice to its own  
-   diff file (`/tmp/pr<number>_<slice>.diff` for a PR, `/tmp/review-local_<slice>.diff`  
-   for a local diff/branch). This grouping is pattern-matching against the  
-   Domain Routing table — do it yourself, it doesn't need a model call.
-2. **Dispatch one `pr-slice-reviewer` sub-agent per slice, in parallel** —
-  not `general-purpose`. It's scoped to read only the diff file it's  
-   given (no `git diff`/`git show`/local-checkout access), which avoids a  
-   failure mode general-purpose agents hit: reading the local checkout  
-   instead of the reviewed branch and reporting findings that don't exist on  
-   it. Give each agent:
-  - The path to its diff file.
-  - The path to the relevant `references/<domain>.md` file(s) — point at  
-  the file, don't paste the checklist inline.
-  - Nothing else; its system prompt already has the core checklist and  
-  output format baked in.
-3. **Reconcile before consolidating** — do not just concatenate sub-agent
-  outputs into the final report:
-  - Re-verify every 🔴/🟡 finding against the actual diff text yourself  
-  before including it. A sub-agent flagging something you're not fully  
-  sure of is a signal to check, not a fact to pass through.
-  - If you can't independently verify a sub-agent-sourced finding against  
-  the diff text, keep it but suffix its `Issue` cell with ` (unverified)`  
-  — don't add `(verified)` to the rows you did confirm.
-  - Check for cross-slice issues no single slice-scoped agent could see:  
-  a shared module changed in one slice and consumed in another, a  
-  schema/contract produced in one slice and read in another, logic  
-  duplicated across slices.
-  - If a slice renames or drops a column/field that the "Downstream  
-  contract impact" bullet (`references/data-engineering.md`) is concerned  
-  with, run `/cross-repo-search <column-name>` across sibling repos  
-  yourself before finalizing — the slice reviewer can't (no `git`/local-  
-  checkout access) — and fold any hit into the Architectural findings  
-  table.
-  - Deduplicate findings raised by more than one slice.
-  - Emit exactly one consolidated report in the Output Format below —  
-  never return the per-slice tables as-is.
-
-### Model & cost guidance
-
-- Splitting the diff into slices (step 1) is pattern-matching, not  
-judgment — do it directly rather than spending a model call on it.
-- Section reviews (step 2) need the same reasoning tier as the main  
-review. Missing a subtle correctness/security/architecture issue costs  
-far more (a bad merge, or rework re-reviewing) than a smaller model  
-saves in tokens — don't downgrade these.
-- The reconciliation step (step 3) is where cross-slice issues and  
-sub-agent misreads get caught — keep it on the main review thread, not  
-delegated to another agent.
+**Large Diff Fan-Out Protocol:** fan out to sub-agents only for a large diff (rule of thumb:  
+more than 500 changed lines, or files across more than two domains). Review other diffs directly.  
+Read `references/fan-out.md` and follow it.
 
 ---
 
@@ -282,14 +212,3 @@ Use this to calibrate — don't over-block on style, don't under-block on correc
 
 Domain-specific severities (Airflow, dbt, Spark, Terraform, Helm, ML, etc.)  
 are tagged inline on their checklist bullets in the reference files.
-
----
-
-## Tips for Better Reviews
-
-- **Add context**: hot-path frequency, PII sensitivity, or what you're unsure  
-about (e.g. "not sure this handles late arrivals") sharpens the review.
-- **Include tests** alongside the diff to get test-quality coverage too.
-- **For domain-specific reviews**, include what unlocks deeper context: dbt →  
-`schema.yml` + upstream `ref()` models; Terraform → the affected  
-`variables.tf`/state backend; ML → training config and eval metrics.
