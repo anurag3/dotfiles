@@ -10,7 +10,7 @@ agent_panel_sort = "priority"
 sidebar_start_collapsed = false     # keep the workspace list visible across many repos
 confirm_close = false
 prompt_new_workspace_name = false   # auto-name workspaces instead of prompting
-status_indicators = "symbols"
+status_indicators = "dots"
 
 [ui.toast]
 delivery = "terminal"
