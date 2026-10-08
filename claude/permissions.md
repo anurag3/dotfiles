@@ -17,19 +17,9 @@ separate file because `settings.json` is strict JSON and can't hold inline comme
 | `Bash(git *)` | Run any `git` subcommand |
 | `Bash(gh *)` | Run any GitHub CLI (`gh`) subcommand |
 | `Bash(sbt *)` | Run any `sbt` (Scala build tool) subcommand |
-| `Bash(rtk ls *)` | `ls` proxied through `rtk` (token-optimized CLI) |
-| `Bash(rtk grep *)` | `grep` proxied through `rtk` |
-| `Bash(rtk find *)` | `find` proxied through `rtk` |
-| `Bash(rtk git *)` | `git` proxied through `rtk` |
-| `Bash(rtk gh *)` | `gh` proxied through `rtk` |
-| `Bash(rtk read *)` | `read` proxied through `rtk` |
-| `Bash(rtk wc *)` | `wc` proxied through `rtk` |
-| `Bash(rtk tree *)` | `tree` proxied through `rtk` |
 | `Bash(sbt test *)` | Explicit `sbt test` variants (redundant with `sbt *`, kept for clarity) |
 | `Bash(mkdir -p /Users/anurag.desai/.claude/plans/**)` | Create plan directories under the absolute plans path |
 | `Bash(mkdir -p ~/.claude/plans/**)` | Create plan directories under the `~`-relative plans path |
-| `Bash(rtk mkdir -p /Users/anurag.desai/.claude/plans/**)` | Same as above, proxied through `rtk` |
-| `Bash(rtk mkdir -p ~/.claude/plans/**)` | Same as above, proxied through `rtk` |
 | `Write(/Users/anurag.desai/.claude/plans/**)` | Create/overwrite files under the absolute plans path |
 | `Write(~/.claude/plans/**)` | Create/overwrite files under the `~`-relative plans path |
 | `Edit(/Users/anurag.desai/.claude/plans/**)` | Edit existing files under the absolute plans path |

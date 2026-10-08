@@ -88,7 +88,6 @@ brew "unibilium" # common
 brew "asdf" # common
 brew "dockutil" # common
 brew "herdr" # common
-brew "rtk" # common
 brew "gum" # common
 
 # ------- Apps -------

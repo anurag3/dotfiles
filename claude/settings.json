@@ -22,19 +22,9 @@
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(sbt *)",
-      "Bash(rtk ls *)",
-      "Bash(rtk grep *)",
-      "Bash(rtk find *)",
-      "Bash(rtk git *)",
-      "Bash(rtk gh *)",
-      "Bash(rtk read *)",
-      "Bash(rtk wc *)",
-      "Bash(rtk tree *)",
       "Bash(sbt test *)",
       "Bash(mkdir -p /Users/anurag.desai/.claude/plans/**)",
       "Bash(mkdir -p ~/.claude/plans/**)",
-      "Bash(rtk mkdir -p /Users/anurag.desai/.claude/plans/**)",
-      "Bash(rtk mkdir -p ~/.claude/plans/**)",
       "Edit(/Users/anurag.desai/.claude/plans/**)",
       "Edit(~/.claude/plans/**)",
       "Bash(defaults read *)"
@@ -46,14 +36,7 @@
       "Bash(git clean -f:*)",
       "Bash(git branch -D:*)",
       "Bash(gh pr merge:*)",
-      "Bash(rtk git push --force:*)",
-      "Bash(rtk git push -f:*)",
-      "Bash(rtk git reset --hard:*)",
-      "Bash(rtk git clean -f:*)",
-      "Bash(rtk git branch -D:*)",
-      "Bash(rtk gh pr merge:*)",
       "Bash(git worktree add:*)",
-      "Bash(rtk git worktree add:*)",
       "EnterWorktree"
     ],
     "defaultMode": "auto",
@@ -63,15 +46,6 @@
   },
   "hooks": {
     "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/rtk-rewrite.sh"
-          }
-        ]
-      },
       {
         "matcher": "Bash",
         "hooks": [
