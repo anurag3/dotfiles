@@ -1,4 +1,5 @@
 onboarding = false
+
 [theme]
 name = "one-dark"
 auto_switch = false
@@ -7,10 +8,10 @@ auto_switch = false
 show_agent_labels_on_pane_borders = false
 agent_panel_sort = "priority"
 sidebar_start_collapsed = false     # keep the workspace list visible across many repos
-confirm_close = true                # don't kill a running agent pane by accident
+confirm_close = false               # don't kill a running agent pane by accident
 prompt_new_workspace_name = false   # auto-name workspaces instead of prompting
-
 status_indicators = "symbols"
+
 [ui.toast]
 delivery = "terminal"
 delay_seconds = 1
