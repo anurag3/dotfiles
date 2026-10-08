@@ -16,7 +16,7 @@ two domains/components from the Domain Routing table in `SKILL.md`).
    Domain Routing table — do it yourself, it doesn't need a model call.
 2. **Dispatch one `pr-slice-reviewer` sub-agent per slice, in parallel** —
   not `general-purpose`. It's scoped to read only the diff file it's  
-   given (no `git diff`/`git show`/local-checkout access), which avoids a  
+   given (no Bash, and told not to read the local checkout), which avoids a  
    failure mode general-purpose agents hit: reading the local checkout  
    instead of the reviewed branch and reporting findings that don't exist on  
    it. Give each agent:
@@ -40,8 +40,8 @@ two domains/components from the Domain Routing table in `SKILL.md`).
   - If a slice renames or drops a column/field that the "Downstream  
   contract impact" bullet (`references/data-engineering.md`) is concerned  
   with, run `rg -lwF '<column-name>' ~/code/` across sibling repos  
-  yourself before finalizing — the slice reviewer can't (no `git`/local-  
-  checkout access) — and fold any hit into the Architectural findings  
+  yourself before finalizing — the slice reviewer has no Bash  
+  and reads only its diff file — and fold any hit into the Architectural findings  
   table.
   - Deduplicate findings raised by more than one slice.
   - Emit exactly one consolidated report in the Output Format from `SKILL.md` —  
