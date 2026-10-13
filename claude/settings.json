@@ -1,8 +1,7 @@
 {
   "env": {
     "DISABLE_TELEMETRY": "1",
-    "DISABLE_ERROR_REPORTING": "1",
-    "CLAUDE_CODE_NO_FLICKER": "1"
+    "DISABLE_ERROR_REPORTING": "1"
   },
   "attribution": {
     "commit": "",
@@ -10,38 +9,37 @@
   },
   "permissions": {
     "allow": [
-      "Bash(ls *)",
-      "Bash(cd *)",
-      "Bash(pwd *)",
-      "Bash(cat *)",
-      "Bash(grep *)",
-      "Bash(find *)",
-      "Bash(read *)",
-      "Bash(wc *)",
       "Bash(tree *)",
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(sbt *)",
-      "Bash(sbt test *)",
-      "Bash(mkdir -p /Users/anurag.desai/.claude/plans/**)",
       "Bash(mkdir -p ~/.claude/plans/**)",
-      "Edit(/Users/anurag.desai/.claude/plans/**)",
+      "Bash(mkdir -p /Users/anurag.desai/.claude/plans/**)",
+      "Bash(mkdir -p ~/.claude/specs/**)",
+      "Bash(mkdir -p /Users/anurag.desai/.claude/specs/**)",
       "Edit(~/.claude/plans/**)",
+      "Edit(~/.claude/specs/**)",
       "Bash(defaults read *)"
     ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)"
+    ],
     "deny": [
-      "Bash(git push --force:*)",
-      "Bash(git push -f:*)",
-      "Bash(git reset --hard:*)",
-      "Bash(git clean -f:*)",
-      "Bash(git branch -D:*)",
-      "Bash(gh pr merge:*)",
-      "Bash(git worktree add:*)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -f *)",
+      "Bash(git branch -D *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh repo delete *)",
+      "Bash(git worktree add *)",
       "EnterWorktree"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
-      "~/.claude/plans/"
+      "~/.claude/plans/",
+      "~/.claude/specs/"
     ]
   },
   "hooks": {
@@ -51,16 +49,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/databricks-guard.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
+            "command": "/Users/anurag.desai/.claude/hooks/databricks-guard.py",
+            "timeout": 10
+          },
           {
             "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/git-convention-guard.py"
+            "command": "/Users/anurag.desai/.claude/hooks/git-convention-guard.py",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "/Users/anurag.desai/.claude/hooks/git-safety-guard.py",
+            "timeout": 10
           }
         ]
       },
@@ -69,7 +69,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/plan-file-location-guard.py"
+            "command": "/Users/anurag.desai/.claude/hooks/plan-file-location-guard.py",
+            "timeout": 10
           }
         ]
       }
@@ -80,7 +81,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/plan-open-in-vscode.py"
+            "command": "/Users/anurag.desai/.claude/hooks/plan-open-in-vscode.py",
+            "timeout": 10,
+            "async": true
           }
         ]
       }
@@ -90,14 +93,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/anurag.desai/.claude/hooks/plan-flat-file-sweep.py"
+            "command": "/Users/anurag.desai/.claude/hooks/plan-flat-file-sweep.py",
+            "timeout": 10
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "startup|clear|compact|resume",
+        "matcher": "startup|resume|fork",
         "hooks": [
           {
             "type": "command",
@@ -124,35 +128,178 @@
     "type": "command",
     "command": "/Users/anurag.desai/.claude/statusline-command.sh",
     "padding": 0,
-    "refreshInterval": 1
+    "refreshInterval": 30
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
-    "i-have-adhd@i-have-adhd": false,
-    "databricks@claude-plugins-official": true,
-    "ponytail@ponytail": true,
-    "jev-code@jev-code": true
+    "databricks@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {
-    "i-have-adhd": {
-      "source": {
-        "source": "github",
-        "repo": "ayghri/i-have-adhd"
-      }
+  "extraKnownMarketplaces": {},
+  "deniedMcpServers": [
+    {
+      "serverName": "claude.ai Atlassian MCP"
     },
-    "jev-code": {
-      "source": {
-        "source": "github",
-        "repo": "FrancoisChastel/jev-code"
-      }
+    {
+      "serverName": "claude.ai HG GTM Tools EKS"
+    },
+    {
+      "serverName": "claude.ai Sequel.io"
+    },
+    {
+      "serverName": "claude.ai Metricool Social Media Management"
+    },
+    {
+      "serverName": "claude.ai Datadog"
+    },
+    {
+      "serverName": "claude.ai Supabase"
+    },
+    {
+      "serverName": "claude.ai Centralize"
+    },
+    {
+      "serverName": "claude.ai Lovable"
+    },
+    {
+      "serverName": "claude.ai Linear"
+    },
+    {
+      "serverName": "claude.ai Wispr Flow"
+    },
+    {
+      "serverName": "claude.ai Funnel"
+    },
+    {
+      "serverName": "claude.ai WeFlow"
+    },
+    {
+      "serverName": "claude.ai Conductor MCP"
+    },
+    {
+      "serverName": "claude.ai lemlist"
+    },
+    {
+      "serverName": "claude.ai HG Devops MCP"
+    },
+    {
+      "serverName": "claude.ai Adobe for creativity"
+    },
+    {
+      "serverName": "claude.ai Ahrefs"
+    },
+    {
+      "serverName": "claude.ai Dux-Soup"
+    },
+    {
+      "serverName": "claude.ai GraphQL - Cloudflare"
+    },
+    {
+      "serverName": "claude.ai Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "claude.ai Phoenix Next Staging"
+    },
+    {
+      "serverName": "claude.ai Phoenix Staging"
+    },
+    {
+      "serverName": "claude.ai Vitally MCP"
+    },
+    {
+      "serverName": "claude.ai Phoenix Next (Prod)"
+    },
+    {
+      "serverName": "claude.ai Four/Four"
+    },
+    {
+      "serverName": "claude.ai Datadog (2)"
+    },
+    {
+      "serverName": "claude.ai Phoenix by HG Insights"
+    },
+    {
+      "serverName": "claude.ai Flockjay"
+    },
+    {
+      "serverName": "claude.ai ZoomInfo"
+    },
+    {
+      "serverName": "claude.ai Zoom for Claude"
+    },
+    {
+      "serverName": "claude.ai Vercel"
+    },
+    {
+      "serverName": "claude.ai Superhuman Mail"
+    },
+    {
+      "serverName": "claude.ai Sentry"
+    },
+    {
+      "serverName": "claude.ai Pylon"
+    },
+    {
+      "serverName": "claude.ai Outreach"
+    },
+    {
+      "serverName": "claude.ai Octave"
+    },
+    {
+      "serverName": "claude.ai Notion"
+    },
+    {
+      "serverName": "claude.ai n8n"
+    },
+    {
+      "serverName": "claude.ai Miro"
+    },
+    {
+      "serverName": "claude.ai Microsoft 365"
+    },
+    {
+      "serverName": "claude.ai Mermaid Chart"
+    },
+    {
+      "serverName": "claude.ai HG Phoenix Admin"
+    },
+    {
+      "serverName": "claude.ai HG Insights"
+    },
+    {
+      "serverName": "claude.ai HG GTM Tools"
+    },
+    {
+      "serverName": "claude.ai HG AI Data Studio"
+    },
+    {
+      "serverName": "claude.ai Granola"
+    },
+    {
+      "serverName": "claude.ai Figma"
+    },
+    {
+      "serverName": "claude.ai Clay"
+    },
+    {
+      "serverName": "claude.ai Canva"
+    },
+    {
+      "serverName": "claude.ai Atlassian Rovo"
+    },
+    {
+      "serverName": "claude.ai Asana"
+    },
+    {
+      "serverName": "claude.ai Amplitude"
+    },
+    {
+      "serverName": "claude.ai AirOps"
     }
-  },
+  ],
   "outputStyle": "ad-concise",
-  "feedbackSurveyRate": 0,
   "spinnerTipsEnabled": true,
   "effortLevel": "high",
   "modelSettings": {
