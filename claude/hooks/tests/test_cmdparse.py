@@ -75,6 +75,12 @@ class Bypasses(unittest.TestCase):
             self.assertIn(self.PUSH, argvs(cmd), cmd)
         self.assertIn(["echo", "x"], argvs('echo "$(git push -f)" && echo x'))
 
+    def test_escaped_backtick_not_substitution(self):
+        self.assertEqual([argv[:2] for argv in argvs('git commit -m "fix: \\`git push -f\\`"')],
+                         [["git", "commit"]])
+        # `\\` is an escaped backslash. The backtick after it starts a substitution.
+        self.assertIn(self.PUSH, argvs("echo \\\\`git push -f`"))
+
     def test_quoted_heredoc_body_not_scanned(self):
         cmd = "git commit -m \"$(cat <<'EOF'\nfix: x\n\nUse `don't` here.\nEOF\n)\""
         self.assertEqual(argvs(cmd)[0][:3], ["git", "commit", "-m"])

@@ -121,9 +121,26 @@ def without_literal_heredocs(command):
     return HEREDOC.sub(lambda m: m.group(3) if m.group(1) else m.group(0), command)
 
 
+def backtick_bodies(text):
+    """Return the body of each backtick span. A backslash before a backtick makes it a literal."""
+    bodies, start, i = [], None, 0
+    while i < len(text):
+        if text[i] == "\\":
+            i += 2
+            continue
+        if text[i] == "`":
+            if start is None:
+                start = i + 1
+            else:
+                bodies.append(text[start:i])
+                start = None
+        i += 1
+    return bodies
+
+
 def substitutions(text):
     """Return the body of each `$(...)` and each backtick span in text."""
-    bodies = re.findall(r"`([^`]*)`", text)
+    bodies = backtick_bodies(text)
     start = text.find("$(")
     while start != -1:
         depth, end = 1, start + 2
