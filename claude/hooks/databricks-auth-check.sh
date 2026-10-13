@@ -24,19 +24,21 @@ command -v jq >/dev/null 2>&1 || exit 0
 # Guard it with a timeout. macOS ships neither GNU `timeout` nor `gtimeout`,
 # so fall back to perl's alarm() (bundled with macOS) as a portable timeout.
 if command -v timeout >/dev/null 2>&1; then
-  output=$(timeout 5 "$databricks_bin" auth profiles 2>/dev/null) || exit 0
+  output=$(timeout 5 "$databricks_bin" auth profiles -o json 2>/dev/null) || exit 0
 elif command -v gtimeout >/dev/null 2>&1; then
-  output=$(gtimeout 5 "$databricks_bin" auth profiles 2>/dev/null) || exit 0
+  output=$(gtimeout 5 "$databricks_bin" auth profiles -o json 2>/dev/null) || exit 0
 else
-  output=$(perl -e 'alarm shift; exec @ARGV' 5 "$databricks_bin" auth profiles 2>/dev/null) || exit 0
+  output=$(perl -e 'alarm shift; exec @ARGV' 5 "$databricks_bin" auth profiles -o json 2>/dev/null) || exit 0
 fi
 
-# Columns are: Name, Host, Valid. Collect the invalid ones as "name|host".
-invalid=$(printf '%s\n' "$output" | awk 'NR>1 && NF>=3 && $NF=="NO" {print $1"|"$2}') || exit 0
+# The JSON shape is {"profiles":[{"name","host","valid"}]} (cmd/auth/profiles.go).
+# "profiles" is null when no profile exists. "host" is absent when it is empty.
+# Collect the invalid profiles as "name|host".
+invalid=$(printf '%s' "$output" | jq -r '.profiles[]? | select(.valid == false) | "\(.name)|\(.host // "")"' 2>/dev/null) || exit 0
 [ -z "$invalid" ] && exit 0
 
 banner=$(printf '%s\n' "$invalid" | while IFS='|' read -r name host; do
-  printf "⚠️ Databricks profile '%s' has invalid/expired auth — run 'databricks auth login --host %s --profile %s' before using it.\n" "$name" "$host" "$name"
+  printf "⚠️ Databricks profile '%s' has invalid/expired auth. Run 'databricks auth login %s--profile %s' before using it.\n" "$name" "${host:+--host $host }" "$name"
 done)
 [ -z "$banner" ] && exit 0
 
