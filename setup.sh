@@ -14,7 +14,7 @@ fi
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Ordered list of section keys, used for selection, help text, and execution order.
-SECTION_KEYS=(macos xcode brew git zsh dotfiles claude nvim vscode rectangle vorssaint spotlight iterm2 ghostty herdr cursor statusline editor bun sublime textreplace)
+SECTION_KEYS=(macos xcode brew git zsh dotfiles claude nvim vscode rectangle vorssaint spotlight iterm2 ghostty herdr cursor editor bun sublime textreplace)
 
 declare -A SECTION_DESC=(
     [macos]="macOS defaults (keyboard, trackpad, Finder, Dock, etc.)"
@@ -33,7 +33,6 @@ declare -A SECTION_DESC=(
     [ghostty]="Ghostty config"
     [herdr]="herdr config"
     [cursor]="Cursor settings + extensions"
-    [statusline]="Claude Code status line"
     [editor]="Default editor (Cursor on work, VSCode on personal)"
     [bun]="Bun install"
     [sublime]="Sublime Text settings"
@@ -786,27 +785,6 @@ if command -v cursor &>/dev/null; then
     xargs -L1 cursor --install-extension < "$DOTFILES_DIR/cursor/extensions.txt"
 else
     echo "    Cursor CLI not found — install extensions manually or re-run after opening Cursor once."
-fi
-}
-
-###############################################################################
-# Claude Code Status Line                                                     #
-###############################################################################
-section_statusline() {
-echo "==> Configuring Claude Code status line..."
-CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-mkdir -p "$HOME/.claude"
-if [ -f "$CLAUDE_SETTINGS" ]; then
-    python3 -c "
-import json
-with open('$CLAUDE_SETTINGS') as f:
-    s = json.load(f)
-s['statusLine'] = {'type': 'command', 'command': '$HOME/.claude/statusline-command.sh', 'padding': 0, 'refreshInterval': 1}
-with open('$CLAUDE_SETTINGS', 'w') as f:
-    json.dump(s, f, indent=2)
-"
-else
-    echo "{\"statusLine\":{\"type\":\"command\",\"command\":\"$HOME/.claude/statusline-command.sh\",\"padding\":0,\"refreshInterval\":1}}" > "$CLAUDE_SETTINGS"
 fi
 }
 

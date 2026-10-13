@@ -18,6 +18,16 @@ bash setup.sh git zsh      # or list section names to run only those
 - Sudo is only requested when the `macos` or `spotlight` sections run (or via the no-args interactive path, which always includes `macos`).
 - Requires bash 4+; the script re-execs itself via Homebrew's bash if the system one is too old.
 
+## Claude Code config (`claude/`)
+
+- `section_claude` symlinks these items into `~/.claude/`: `CLAUDE.md`, `settings.json`, `statusline-command.sh`, `hooks/`, `skills/`, `agents/`, and `output-styles/ad-concise.md`.
+- The Bash guard hooks use the shared parser `claude/hooks/cmdparse.py`.
+- To run the hook tests, run this command from the repo root:
+
+```bash
+python3 -m unittest discover -s claude/hooks/tests -v
+```
+
 ## iTerm2 Color Scheme
 
 Monokai Soda — must be manually imported from the iTerm2-Color-Schemes repo.

@@ -11,7 +11,8 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "~/.claude/hooks/implementer-git-guard.sh"
+          command: "/Users/anurag.desai/.claude/hooks/git-safety-guard.py --implementer"
+          timeout: 10
 ---
 
 You implement ONE task from an implementation plan. Other implementers can work on other tasks in the same working tree at the same time.

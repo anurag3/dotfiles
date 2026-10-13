@@ -13,8 +13,8 @@ description: >
 
 ## Delegates to
 
-All DAB mechanics — `databricks.yml` syntax, resource types, variables,
-`bundle validate`/`deploy` semantics — are the vendored `databricks:databricks-dabs`
+All DAB mechanics (`databricks.yml` syntax, resource types, variables,
+`bundle validate`/`deploy` semantics) are the vendored `databricks:databricks-dabs`
 skill's job. Load it for that. This skill owns only the sequencing and
 confirmation steps around it, driven by defects that have recurred across past
 scaffolds: a reference repo's alert email or "chargeback" variable description
@@ -34,7 +34,7 @@ code exists, not during review.
 Read its full bundle config (`databricks.yml`, `resources/*.yml`, variable
 files) and list every repo-specific value: alert emails, team/owner names,
 variable descriptions, resource IDs, service-principal IDs. Nothing gets
-carried into the new bundle by default — everything on this list is a
+carried into the new bundle by default. Everything on this list is a
 candidate for step 2.
 
 ### 2. Confirm before writing anything
@@ -42,10 +42,10 @@ candidate for step 2.
 Ask the user explicitly, before any file is written:
 
 - `env_tag` default for the new target(s)
-- `alert_email` — never silently reuse the reference repo's
+- `alert_email`: never silently reuse the reference repo's
 - Python version pin, with a stated reason (e.g. "matches DBR 14.x runtime"),
   not just copied from the reference
-- Whether this bundle actually needs a wheel artifact — many need only
+- Whether this bundle actually needs a wheel artifact. Many need only
   notebooks/files. Ask; don't default to "yes" because the reference had one.
 
 ### 3. Scaffold
@@ -64,14 +64,14 @@ scratch) but with every step-1 value replaced by what was confirmed in step 2:
 In your response, list every value stripped from the reference and what it
 was replaced with (e.g. "alert_email: data-eng@ref-repo.com → confirmed
 value"). This is the CLAUDE.md rule 3 "list what was stripped for
-confirmation" requirement — don't skip it even if step 2's answers make it
+confirmation" requirement. Don't skip it even if step 2's answers make it
 feel redundant.
 
-### 5. Validate — never deploy
+### 5. Validate, never deploy
 
 Per CLAUDE.md rule 9 (Databricks Command Confirmation), state the exact
-command and target/profile and get explicit approval before running anything
-— `bundle validate` included, even though it looks read-only. Once approved,
+command and target/profile and get explicit approval before running anything,
+`bundle validate` included, even though it looks read-only. Once approved,
 run `databricks bundle validate -t <target>` for each target (see the
 `databricks-dabs` skill for exact invocation/flags).
 
@@ -86,7 +86,7 @@ one exists.
 
 ## Constraints
 
-- Never write DAB YAML syntax reference material here — point at
+- Never write DAB YAML syntax reference material here. Point at
   `databricks:databricks-dabs` instead.
 - Never invoke `bundle deploy`, `jobs run-now`, or `pipelines start-update`
   from this skill.
