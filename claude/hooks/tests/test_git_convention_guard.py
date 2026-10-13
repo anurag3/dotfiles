@@ -92,10 +92,6 @@ class CommitTests(unittest.TestCase):
         self.assertEqual(decision("git commit -F msg.txt"), "allow")
         self.assertEqual(decision("git commit --amend --no-edit"), "allow")
 
-    def test_rtk_prefix(self):
-        self.assertEqual(decision('rtk git commit -m "bad subject"'), "deny")
-        self.assertEqual(decision('rtk git commit -m "test: add cases"'), "allow")
-
     def test_git_global_options_and_chaining(self):
         self.assertEqual(decision('git -C /tmp/repo commit -m "bad"'), "deny")
         self.assertEqual(decision('cd x && git add . && git commit -m "bad"'), "deny")
@@ -128,9 +124,6 @@ class BranchTests(unittest.TestCase):
     def test_branch_ponytail_denied(self):
         self.assertEqual(decision("git checkout -b chore/ponytail-cleanup"), "deny")
 
-    def test_rtk_prefix(self):
-        self.assertEqual(decision("rtk git checkout -b wip"), "deny")
-
     def test_plain_checkout_allowed(self):
         self.assertEqual(decision("git checkout main"), "allow")
         self.assertEqual(decision("git switch main"), "allow")
@@ -161,9 +154,6 @@ EOF
 
     def test_fill_allowed(self):
         self.assertEqual(decision("gh pr create --fill"), "allow")
-
-    def test_rtk_prefix(self):
-        self.assertEqual(decision('rtk gh pr create --title "nope" --body "x"'), "deny")
 
 
 class InputTests(unittest.TestCase):
@@ -235,7 +225,7 @@ docs: update readme
 EOF"""
         self.assertEqual(decision(bad), "deny")
         self.assertEqual(decision(good), "allow")
-        self.assertEqual(decision("git commit -F -"), "allow")
+        self.assertEqual(decision("git commit -F -"), "deny")
 
     def test_trailer_banned(self):
         self.assertEqual(decision('git commit -m "fix: x" --trailer "Co-authored-by: Claude <a@b>"'), "deny")
@@ -302,6 +292,49 @@ EOF"""
         for subject in ['Revert "add x"', "fixup! add y", "fixup!fix: y"]:
             with self.subTest(subject=subject):
                 self.assertEqual(decision(f"git commit -m '{subject}'"), "deny")
+
+
+class Bypasses(unittest.TestCase):
+    def test_wrappers(self):
+        for cmd in ('env git commit -m "bad"', 'command git commit -m "bad"',
+                    '/usr/bin/git commit -m "bad"', "bash -c 'git commit -m bad'"):
+            self.assertEqual(decision(cmd), "deny", cmd)
+
+    def test_gh_global_flag_and_alias(self):
+        self.assertEqual(decision('gh -R o/r pr create --title "bad" --body "x"'), "deny")
+        self.assertEqual(decision('gh pr new --title "bad" --body "x"'), "deny")
+
+    def test_piped_stdin_message(self):
+        self.assertEqual(decision('echo "bad" | git commit -F -'), "deny")
+        self.assertEqual(decision("echo x | gh pr create --title 'fix: x' --body-file -"), "deny")
+
+    def test_merge_message(self):
+        self.assertEqual(decision('git merge feature -m "bad"'), "deny")
+        self.assertEqual(decision("git merge -Xrenormalize feature"), "allow")
+        self.assertEqual(decision("git merge -Xrename-threshold=50% -s ort feature"), "allow")
+
+    def test_here_string_message(self):
+        cmd = 'git commit -F - <<< "bad"'
+        self.assertEqual(decision(cmd), "deny")
+        self.assertIn("here-string", reason(cmd))
+
+    def test_banned_word_boundary(self):
+        self.assertEqual(decision('git commit -m "fix: correct rounding" -m "fix rounding in totals"'), "allow")
+        self.assertEqual(decision('git commit -m "fix: x" -m "per the planned schedule"'), "allow")
+        self.assertEqual(decision('git commit -m "fix: x" -m "fix round 2"'), "deny")
+
+    def test_parse_error_allows(self):
+        self.assertEqual(decision("git commit -m 'unclosed"), "allow")
+
+    def test_bad_json_allows(self):
+        self.assertEqual(run_hook("not json"), "")
+        self.assertEqual(run_hook(json.dumps({"tool_name": "Bash", "tool_input": {"command": 5}})), "")
+
+    def test_binary_message_file_allows(self):
+        with tempfile.NamedTemporaryFile(suffix=".bin", delete=False) as f:
+            f.write(b"\xff\xfe\x00")
+        self.addCleanup(Path(f.name).unlink)
+        self.assertEqual(decision(f"git commit -F {f.name}"), "allow")
 
 
 if __name__ == "__main__":

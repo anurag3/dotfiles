@@ -2,13 +2,17 @@
 """PreToolUse guard for Bash: enforces global CLAUDE.md rules 12 (Conventional
 Commits) and 13 (no attribution or internal artifacts in commits and PRs).
 
-Checks, with or without a leading `rtk`:
+Checks each simple command after wrappers (`env`, `bash -c`, absolute path):
   - `git commit` with `-m`, `-F <file>`, `-F -` (heredoc), and `--trailer`:
     Conventional Commit subject, no banned text.
+  - `git merge -m`: same checks as `git commit -m`.
   - `git checkout -b/-B`, `git switch -c/-C/--create`, `git branch <name>`,
     `git branch -m/-M`: branch name `<type>/<kebab>`.
-  - `gh pr create` and `gh pr edit` with `--title`, `--body`, `--body-file`:
-    same subject format, no banned text.
+  - `gh pr create`, `gh pr new`, and `gh pr edit` with `--title`, `--body`,
+    `--body-file`: same subject format, no banned text.
+
+A message from piped stdin or a here-string (`-F -` or `--body-file -` without
+a heredoc) is denied, because the hook cannot read it.
 
 Fails open: if the hook input, the command, or a message file cannot be read,
 it allows.
@@ -16,26 +20,20 @@ it allows.
 import json
 import os
 import re
-import shlex
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import cmdparse  # noqa: E402
 
 TYPES = "feat|fix|chore|docs|refactor|test|perf|ci|build"
 SUBJECT = re.compile(rf"^({TYPES})(\([A-Za-z0-9._/-]+\))?!?: \S")
 BRANCH = re.compile(rf"^({TYPES})/[a-z0-9][a-z0-9-]*$")
 BANNED = re.compile(
     r"generated with \[?claude|co-authored-by:\s*claude|noreply@anthropic\.com"
-    r"|\.claude/plans|\.claude/specs|fix round|per the plan|ponytail"
+    r"|\.claude/plans|\.claude/specs|\bfix round\b|\bper the plan\b|ponytail"
     r"|^[ \t]*(?:[-*][ \t]+)?\(?task \d+\b",
     re.I | re.M,
 )
-# `"$(cat <<'EOF' ... EOF\n)"`: the body becomes one argument value.
-CAT_HEREDOC = re.compile(
-    r"\$\(\s*cat\s+<<-?\s*(['\"]?)(\w+)\1[ \t]*\n(.*?)\n[ \t]*\2[ \t]*\n?\s*\)", re.S
-)
-# Any other heredoc: the body becomes the stdin of its command, never command text.
-HEREDOC = re.compile(r"(?<!<)<<-?[ \t]*(['\"]?)(\w+)\1([^\n]*)\n(.*?)\n[ \t]*\2[ \t]*(?=\n|$)", re.S)
-SEPARATOR = re.compile(r"^[;&|()\n]+$")
-GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 BRANCH_CREATE_OPTS = {"-f", "--force", "-t", "--track", "--no-track", "-q", "--quiet"}
 BRANCH_RENAME_OPTS = {"-m", "-M", "--move"}
 
@@ -58,44 +56,6 @@ def deny(reason: str) -> None:
         }
     }))
     sys.exit(0)
-
-
-def segments(command: str) -> list:
-    """Split a shell command into (tokens, heredoc stdin) for each simple command."""
-    stash = []
-
-    def keep(text: str, kind: str) -> str:
-        stash.append(text)
-        return f"__{kind}{len(stash) - 1}__"
-
-    command = CAT_HEREDOC.sub(lambda m: keep(m.group(3), "ARG"), command)
-    command = HEREDOC.sub(lambda m: f" {keep(m.group(4), 'STDIN')} {m.group(3)}", command)
-
-    lex = shlex.shlex(command, posix=True, punctuation_chars=";&|()<>\n")
-    lex.whitespace = " \t\r"
-    lex.whitespace_split = True
-    result, tokens, stdin = [], [], None
-    for tok in lex:
-        placeholder = re.fullmatch(r"__(ARG|STDIN)(\d+)__", tok)
-        if SEPARATOR.match(tok):
-            result.append((tokens, stdin))
-            tokens, stdin = [], None
-        elif placeholder and placeholder.group(1) == "STDIN":
-            stdin = stash[int(placeholder.group(2))]
-        else:
-            tokens.append(stash[int(placeholder.group(2))] if placeholder else tok)
-    result.append((tokens, stdin))
-    return [(t, s) for t, s in result if t]
-
-
-def strip_prefix(tokens: list) -> list:
-    """Drop env assignments and a leading `rtk`."""
-    i = 0
-    while i < len(tokens) and re.match(r"^\w+=", tokens[i]):
-        i += 1
-    if i < len(tokens) and tokens[i] == "rtk":
-        i += 1
-    return tokens[i:]
 
 
 def option_values(args: list, short: str, long: str) -> list:
@@ -125,11 +85,14 @@ def option_values(args: list, short: str, long: str) -> list:
 def read_text(path: str, stdin, base: str):
     """Return the text of a message file, `-` for heredoc stdin, or None if unreadable."""
     if path == "-":
+        if stdin is None:
+            deny("[BLOCKED] CLAUDE.md rule 12: the message comes from piped stdin or a "
+                 "here-string (<<<), so the hook cannot check it. Use -m or a heredoc.")
         return stdin
     try:
         with open(os.path.join(base, os.path.expanduser(path))) as handle:
             return handle.read()
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None
 
 
@@ -168,16 +131,16 @@ def check_branch(name: str) -> None:
 
 
 def check_git(args: list, stdin, base: str) -> None:
-    i = 0
-    while i < len(args) and args[i].startswith("-"):
-        if args[i] == "-C" and i + 1 < len(args):
-            base = os.path.join(base, args[i + 1])
-        i += 2 if args[i] in GIT_OPTS_WITH_VALUE else 1
-    if i >= len(args):
-        return
-    sub, rest = args[i], args[i + 1:]
+    dirs, sub, rest = cmdparse.split_git(args)
+    for directory in dirs:
+        base = os.path.join(base, directory)
 
-    if sub == "commit":
+    if sub == "merge":
+        # The `m` in `-Xrenormalize` is not a `-m` flag.
+        messages = option_values([a for a in rest if not a.startswith(("-X", "-s"))], "m", "--message")
+        if messages:
+            check_message("\n\n".join(messages), "merge message")
+    elif sub == "commit":
         messages = option_values(rest, "m", "--message")
         if messages:
             check_message("\n\n".join(messages), "commit message")
@@ -203,7 +166,8 @@ def check_git(args: list, stdin, base: str) -> None:
 
 
 def check_gh(args: list, stdin, base: str) -> None:
-    if len(args) < 2 or args[0] != "pr" or args[1] not in ("create", "edit"):
+    args = cmdparse.split_gh(args)
+    if len(args) < 2 or args[0] != "pr" or args[1] not in ("create", "new", "edit"):
         return
     rest = args[2:]
     for title in option_values(rest, "t", "--title"):
@@ -224,22 +188,19 @@ def main() -> None:
         cwd = data.get("cwd") or os.getcwd()
     except Exception:
         return
-    if not command:
+    if not command or not isinstance(command, str):
         return
 
     try:
-        parsed = segments(command)
+        parsed = cmdparse.simple_commands(command)
     except ValueError:
         return
 
-    for tokens, stdin in parsed:
-        tokens = strip_prefix(tokens)
-        if not tokens:
-            continue
-        if tokens[0] == "git":
-            check_git(tokens[1:], stdin, cwd)
-        elif tokens[0] == "gh":
-            check_gh(tokens[1:], stdin, cwd)
+    for _, argv, stdin in parsed:
+        if argv[0] == "git":
+            check_git(argv[1:], stdin, cwd)
+        elif argv[0] == "gh":
+            check_gh(argv[1:], stdin, cwd)
 
 
 if __name__ == "__main__":
