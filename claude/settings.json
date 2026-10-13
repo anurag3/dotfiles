@@ -132,10 +132,13 @@
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": false,
+    "commit-commands@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
     "databricks@claude-plugins-official": true
+  },
+  "skillOverrides": {
+    "bundle-scaffold": "off"
   },
   "extraKnownMarketplaces": {},
   "deniedMcpServers": [
@@ -297,6 +300,54 @@
     },
     {
       "serverName": "claude.ai AirOps"
+    },
+    {
+      "serverName": "claude.ai Viatelly MCP"
+    },
+    {
+      "serverName": "claude.ai Phoenix Admin"
+    },
+    {
+      "serverName": "claude.ai Claude Docs"
+    },
+    {
+      "serverName": "claude.ai Gmail"
+    },
+    {
+      "serverName": "claude.ai Google Calendar"
+    },
+    {
+      "serverName": "claude.ai Google Docs"
+    },
+    {
+      "serverName": "claude.ai Google Sheets"
+    },
+    {
+      "serverName": "claude.ai Google Slides"
+    },
+    {
+      "serverName": "claude.ai Slack"
+    },
+    {
+      "serverName": "claude.ai Excalidraw"
+    },
+    {
+      "serverName": "claude.ai tldraw"
+    },
+    {
+      "serverName": "claude.ai Mermaid Chart (2)"
+    },
+    {
+      "serverName": "claude.ai Twilio"
+    },
+    {
+      "serverName": "claude.ai AE Weekly Check-in"
+    },
+    {
+      "serverName": "claude.ai MCP APP"
+    },
+    {
+      "serverName": "claude.ai MCP APPS"
     }
   ],
   "outputStyle": "ad-concise",
