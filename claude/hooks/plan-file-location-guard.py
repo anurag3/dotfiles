@@ -1,41 +1,27 @@
 #!/usr/bin/env python3
-"""PreToolUse guard for Write: enforces the plan-file-location skill's path
-convention (~/.claude/plans/<repo>/<YYYY-MM-DD>-<desc>/<desc>_plan.md) so a
-misplaced plan file is rejected at write-time instead of relying on the model
-to remember to invoke the skill.
+"""PreToolUse guard for Write: enforces CLAUDE.md rule 6 for plans and specs.
+
+1. Denies a plan or spec file that is not at the rule 6 path.
+2. Denies writes to docs/superpowers/plans/ and docs/superpowers/specs/.
+3. Replaces the superpowers subagent-driven-development header in a plan
+   with the executing-plans-in-waves header (CLAUDE.md rule 5).
 """
 import json
 import os
 import re
 import sys
 
-def main():
-    data = json.load(sys.stdin)
-    file_path = data.get("tool_input", {}).get("file_path", "")
-    base = os.path.join(os.path.expanduser("~"), ".claude", "plans") + os.sep
-    if not file_path.startswith(base):
-        return
+DATED = re.compile(r"^\d{4}-\d{2}-\d{2}-.+")
+PLAN_TEMPLATE = "~/.claude/plans/<repo>/<YYYY-MM-DD>-<description>/<description>_plan.md"
+SPEC_TEMPLATE = "~/.claude/specs/<repo>/<YYYY-MM-DD>-<description>/<description>_spec.md"
+SDD_MARKER = "REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development"
+WAVES_HEADER = (
+    "> **For agentic workers:** REQUIRED SUB-SKILL: Use executing-plans-in-waves "
+    "to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking."
+)
 
-    rel = file_path[len(base):]
-    parts = rel.split(os.sep)
-    # Nested convention: <repo>/<YYYY-MM-DD>-<desc>/<desc>_plan.md
-    nested = len(parts) >= 3 and re.match(r"^\d{4}-\d{2}-\d{2}-.+", parts[1])
-    # Flat form assigned by Claude Code's own plan-mode harness: plans/<slug>.md
-    flat = len(parts) == 1 and parts[0].endswith(".md")
-    # Depth-2 markdown file directly under a repo's plan directory (e.g. a
-    # handoff note): <repo>/<some-file>.md
-    depth2_md = len(parts) == 2 and parts[1].endswith(".md")
-    if nested or flat or depth2_md:
-        return
 
-    reason = (
-        "Blocked: plan files must live at "
-        "~/.claude/plans/<repo>/<YYYY-MM-DD>-<plan_description>/<plan_description>_plan.md "
-        f"(got: {file_path}). This does not match CLAUDE.md rule 6's (Spec & Plan File Location) "
-        "required plan file path. Derive the correct repo/date/description and mkdir -p that "
-        "path before writing — do this even if plan mode was already active with no "
-        "EnterPlanMode tool call."
-    )
+def deny(reason):
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
@@ -43,6 +29,76 @@ def main():
             "permissionDecisionReason": reason,
         }
     }))
+
+
+def in_dated_dir(parts):
+    return len(parts) >= 3 and bool(DATED.match(parts[1]))
+
+
+# Contract from https://code.claude.com/docs/en/hooks (PreToolUse decision control):
+# hookSpecificOutput.updatedInput replaces the entire tool input, so it must
+# include file_path and content. It applies with permissionDecision "allow" or
+# "ask". This hook uses "allow", so this Write gets no permission prompt.
+# The hook sends "allow" only for valid plan and spec paths.
+# Deny and ask rules in settings still apply to the new input.
+def rewrite_header(content):
+    lines = content.split("\n")
+    return "\n".join(WAVES_HEADER if SDD_MARKER in line else line for line in lines)
+
+
+def main():
+    try:
+        data = json.load(sys.stdin)
+        tool_input = data.get("tool_input", {})
+        file_path = os.path.normpath(tool_input.get("file_path", ""))
+
+        if "/docs/superpowers/plans/" in file_path or "/docs/superpowers/specs/" in file_path:
+            deny(
+                f"Blocked: {file_path} is a superpowers default path. CLAUDE.md rule 6 requires "
+                f"plans at {PLAN_TEMPLATE} and specs at {SPEC_TEMPLATE}. "
+                "Make the directory with mkdir -p, then write the file there."
+            )
+            return
+
+        claude = os.path.join(os.path.expanduser("~"), ".claude")
+        plans = os.path.join(claude, "plans") + os.sep
+        specs = os.path.join(claude, "specs") + os.sep
+
+        if file_path.startswith(plans):
+            parts = file_path[len(plans):].split(os.sep)
+            # parts == 1 is the plan mode file. parts == 2 is a handoff note.
+            allowed = (len(parts) in (1, 2) and parts[-1].endswith(".md")) or in_dated_dir(parts)
+            template = PLAN_TEMPLATE
+        elif file_path.startswith(specs):
+            allowed = in_dated_dir(file_path[len(specs):].split(os.sep))
+            template = SPEC_TEMPLATE
+        else:
+            return
+
+        if not allowed:
+            deny(
+                f"Blocked: {file_path} does not match the CLAUDE.md rule 6 path {template}. "
+                "Find the repo, date, and description, make the directory with mkdir -p, "
+                "then write the file there. Do this also when plan mode was active "
+                "without an EnterPlanMode tool call."
+            )
+            return
+
+        content = tool_input.get("content")
+        if isinstance(content, str):
+            new_content = rewrite_header(content)
+            if new_content != content:
+                print(json.dumps({
+                    "hookSpecificOutput": {
+                        "hookEventName": "PreToolUse",
+                        "permissionDecision": "allow",
+                        "permissionDecisionReason": "Replaced the superpowers execution header (CLAUDE.md rule 5).",
+                        "updatedInput": dict(tool_input, content=new_content),
+                    }
+                }))
+    except Exception:
+        return
+
 
 if __name__ == "__main__":
     main()
