@@ -152,7 +152,7 @@ and Verdict line follows these rules:
 Produce the review in this exact structure. Do not omit any section, even if  
 it has no findings. Use "No issues found." in that case.
 
-```markdown
+````markdown
 ### Summary
 [1–2 sentences. What it does + merge-readiness. No elaboration.]
 
@@ -184,11 +184,71 @@ Severity scale:
 
 [1–2 sentences. If REQUEST CHANGES, name the specific blockers. If NEEDS DISCUSSION,
 name the open question that must be resolved first.]
+
+### 💬 PR Comments
+**Pain Points #1 · `file.py:40-42`**
+
+blocker: [What breaks and why. The ask.]
+
+```suggestion
+[Replacement lines, indented exactly as in the file.]
 ```
+````
 
 During fan-out reconciliation, suffix `Issue` with ` (unverified)` for a  
 finding you passed through without independently confirming it against the  
 diff text. Leave every other row unsuffixed.
+
+If there are no findings, write "No comments." in the 💬 PR Comments section.
+
+---
+
+## PR Comments
+
+Write one comment for each finding row, in table order: Pain Points, then  
+Security Issues, then Architectural Issues. The user pastes each comment on  
+the PR without changes.
+
+After the finding comments, you can write praise comments. Write a praise  
+comment only for a ✅ What's Done Well row that is unusually good. Examples are  
+a pattern that the team can use again and a good decision that is not obvious.  
+Most reviews need zero or one praise comment. Do not write a praise comment  
+for standard good practice. Use ``**What's Done Well #<n> · `<Location>`**`` as  
+the heading. Set the Location to the lines in the diff that show the pattern.
+
+- Heading: ``**<Table> #<n> · `<Location>`**``.
+- Comment line: `<label>: <what breaks and why>. <the ask>.` Write one line  
+  of 30 words or fewer. Write the ask as a request ("Can we ...?") or as a  
+  direct instruction.
+- Praise comment line: `<label>: <what is good and why>.` Write one line of 30  
+  words or fewer. Do not write an ask.
+
+| Finding                                                                    | Label            |
+| -------------------------------------------------------------------------- | ---------------- |
+| 🔴 Blocker                                                                 | `blocker:`       |
+| 🟡 Major                                                                   | `issue:`         |
+| 🟢 Minor                                                                   | `suggestion:`    |
+| 🟢 Minor, naming or style only                                             | `nit:`           |
+| Any severity, marked `(unverified)` or dependent on facts outside the diff | `question:`      |
+| ✅ What's Done Well: a pattern worth reusing in other code                 | `stealing this:` |
+| ✅ What's Done Well: a good design decision                                | `love this:`     |
+| ✅ What's Done Well: a fact or technique that is new to the reviewer       | `TIL:`           |
+| ✅ What's Done Well: simple, readable code                                 | `clean:`         |
+
+Use these rules for the `suggestion` block:
+
+1. Add a `suggestion` block only when the fix replaces lines that the diff  
+   shows in the new file. Otherwise, do not add the block.
+2. Set the heading Location to the exact line range that the block replaces  
+   (`file.py:270-276`). GitHub replaces all lines in that range with the  
+   block contents.
+3. Copy the indentation of each line exactly from the diff. If the  
+   indentation is wrong, the code breaks when the author commits the  
+   suggestion.
+4. Put only the replacement lines in the block. Do not include `+` or `-`  
+   markers or `...` placeholders.
+5. If the fix changes more than one file or lines outside the diff hunks, do  
+   not add the block. GitHub cannot attach a suggestion to those lines.
 
 ---
 
