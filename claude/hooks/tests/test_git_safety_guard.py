@@ -28,9 +28,15 @@ ALWAYS_DENY = [
     "echo x | xargs git reset --hard",
     "git push --mirror", "git push origin :feat/x", "git push origin --delete x", "git push -d origin x",
     "git branch -Df old", "git branch -df old",
+    "git push origin feat/x && git push -f",
+]
+ASK = [
+    "git push", "git push origin feat/x", "git push -u origin feat/x", "git push --follow-tags",
+    "git -C . push origin main", "env git push", "bash -c 'git push'", 'echo "$(git push)"',
+    "gh pr create --title x", "gh -R o/r pr create", "gh pr new",
 ]
 ALWAYS_ALLOW = [
-    "git status", "git push origin feat/x", "git push -u origin feat/x", "git push --follow-tags",
+    "git status", "gh pr view 1", "gh pr list",
     "git reset HEAD~1", "git clean -n", "git branch -d merged", "git worktree list",
     'git commit -m "docs: explain git reset --hard"', "echo 'git push --force'",
     "git commit -m \"$(cat <<'EOF'\nfix: avoid git reset --hard in docs\nEOF\n)\"",
@@ -61,6 +67,10 @@ class Guard(unittest.TestCase):
     def test_always_deny(self):
         for cmd in ALWAYS_DENY:
             self.assertEqual(decision(cmd), "deny", cmd)
+
+    def test_ask(self):
+        for cmd in ASK:
+            self.assertEqual(decision(cmd), "ask", cmd)
 
     def test_always_allow(self):
         for cmd in ALWAYS_ALLOW:

@@ -5,6 +5,10 @@ The deny rules in settings.json match command text only. They miss forms such
 as `git -C . reset --hard` and `git push origin +main`. This hook parses each
 simple command and checks the git subcommand.
 
+The ask rules in settings.json also match command text only. This hook asks
+the user before every other form of `git push`, `gh pr create`, and
+`gh pr new`. A deny for one simple command has priority over an ask.
+
 With --implementer, it allows only read-only git commands. Parallel
 implementers share one working tree, and the controller commits after each
 wave.
@@ -36,10 +40,14 @@ IMPLEMENTER_MESSAGE = ("Blocked: implementers must not change git state. The con
                        "Report your changes instead.")
 
 
-def deny(reason):
+def decide(decision, reason):
     print(json.dumps({"hookSpecificOutput": {
-        "hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": reason}}))
+        "hookEventName": "PreToolUse", "permissionDecision": decision, "permissionDecisionReason": reason}}))
     sys.exit(0)
+
+
+def deny(reason):
+    decide("deny", reason)
 
 
 def short_flag(args, letter):
@@ -119,7 +127,10 @@ def main():
         if re.search(r"\bgit\b", command):
             deny("[BLOCKED] git-safety-guard could not parse this command. Fix the quoting.")
         return
+    ask_reason = None
     for _, argv, _ in parsed:
+        if argv[0] == "gh" and cmdparse.split_gh(argv[1:])[:2] in (["pr", "create"], ["pr", "new"]):
+            ask_reason = ask_reason or "gh pr create needs user confirmation (settings ask rule)."
         args = git_args(argv)
         if args is None:
             continue
@@ -132,6 +143,11 @@ def main():
             deny(f"[BLOCKED] git {reason} discards work or rewrites history. Ask the user to run it with `!`.")
         if implementer and not implementer_allowed(sub, rest):
             deny(IMPLEMENTER_MESSAGE)
+        if sub == "push":
+            ask_reason = ask_reason or "git push needs user confirmation (settings ask rule)."
+    # A later simple command can still deny, so the ask comes only after the full scan.
+    if ask_reason:
+        decide("ask", ask_reason)
 
 
 if __name__ == "__main__":

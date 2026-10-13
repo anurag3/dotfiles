@@ -31,6 +31,8 @@ Claude asks for approval before it runs these commands. An `ask` rule has priori
 | `Bash(git push *)` | Approve each push to a remote branch |
 | `Bash(gh pr create *)` | Approve each new pull request |
 
+An ask rule matches the plain command text only. The `git-safety-guard.py` hook asks for approval for all other forms of `git push`, `gh pr create`, and `gh pr new`, for example `git -C . push` and `gh -R o/r pr create`.
+
 ## `deny`
 
 Claude cannot run these commands.
