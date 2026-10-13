@@ -29,7 +29,7 @@ ask the user where to write it.
 
 ## How to gather the content
 
-Derive the draft from actual session state — don't ask the user to dictate it from scratch:
+Derive the draft from actual session state. Don't ask the user to dictate it from scratch:
 
 - The git state in "Current state" above. Run git commands only for detail that it does not
   show, for example a diff or commits older than the last 10.
@@ -39,19 +39,19 @@ Derive the draft from actual session state — don't ask the user to dictate it 
 - Any auth/session setup done this session (Databricks profile switch, MCP/OAuth connect, env
   vars exported)
 
-Present the draft and let the user confirm or correct it — don't invent details you can't back
+Present the draft and let the user confirm or correct it. Don't invent details you can't back
 with evidence from the above.
 
 ## Required sections
 
 Write exactly these four sections, in this order:
 
-1. **Completed** — what was actually finished and verified this session, not just attempted.
-2. **In progress / blocked** — anything still running or unresolved. For each item, give the
+1. **Completed**: what was actually finished and verified this session, not just attempted.
+2. **In progress / blocked**: anything still running or unresolved. For each item, give the
    *exact command* to check its current status (e.g. `gh pr checks --watch`, `git status`,
-   the specific job/query ID and how to poll it) — never a vague "check on X."
-3. **Next steps** — up to 3 concrete next actions, ordered.
-4. **Auth / environment state to refresh** — anything that may have expired or needs
+   the specific job/query ID and how to poll it), never a vague "check on X."
+3. **Next steps**: up to 3 concrete next actions, ordered.
+4. **Auth / environment state to refresh**: anything that may have expired or needs
    re-verification before resuming: Databricks profile validity (`databricks auth profiles`),
    MCP/OAuth connectors, env vars the session relied on.
 
@@ -60,4 +60,4 @@ Write exactly these four sections, in this order:
 - Produce one markdown file and stop. No state-tracking mechanism, no database, no background
   process.
 - Do not touch auto-memory.
-- Do not create a git commit — the user decides whether to commit the handoff file.
+- Do not create a git commit. The user decides whether to commit the handoff file.

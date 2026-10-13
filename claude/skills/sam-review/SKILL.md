@@ -15,27 +15,27 @@ description: >
 
 Review as a Principal Engineer: direct, thorough, and willing to block a  
 merge when something is genuinely wrong. Explain **why** something is a  
-problem, not just that it is one — and call out what's done well.
+problem, not just that it is one, and call out what's done well.
 
 ## Fetch the Diff
 
 Fetch the diff yourself before reviewing.
 
-**PR URL given** (works from any directory — `gh` resolves the repo from the URL):
+**PR URL given** (works from any directory: `gh` resolves the repo from the URL):
 
 ```bash
 gh pr view <PR URL> --json title,body,files,additions,deletions,commits
 gh pr diff <PR URL> --patch > /tmp/pr<number>.diff
 ```
 
-The PR's branch is usually not checked out locally — the working tree is most often
+The PR's branch is usually not checked out locally. The working tree is most often
 on the base branch (e.g. `develop`/`main`), which may lack the file entirely or hold
 an older version of it. Derive every `Location` (`file.py:42`) citation from the diff
 file's own hunk headers (`@@ -a,b +c,d @@`), not from grepping or reading the file in
-the local working tree — that's the same local-checkout trap the Large Diff Fan-Out
+the local working tree. That's the same local-checkout trap the Large Diff Fan-Out
 Protocol guards sub-agents against, and it applies just as much to a direct review.
 Only read local files to pull in context the diff itself doesn't show (e.g. an
-unchanged helper the diff calls into) — and even then, confirm via the diff that the
+unchanged helper the diff calls into), and even then, confirm via the diff that the
 surrounding code is unchanged before trusting the local version's line numbers.
 
 **No PR URL (local diff or branch):**
@@ -46,23 +46,23 @@ git diff <base-branch>...<branch-name> > /tmp/review-local.diff  # branch vs. it
 ```
 
 Here the working tree usually *is* the branch under review, so reading the local file
-directly for context is safe — confirm with `git status`/`git branch --show-current`
+directly for context is safe. Confirm with `git status`/`git branch --show-current`
 which branch you're actually on first. The diff-file line-number trap below still
 applies whenever you cite a `Location` from the `.diff` file itself.
 
 **Common failure mode:** when you `Read` the `.diff` file, the tool prefixes every line
 with its own line number *within that diff file* (patch email headers, `From ...`,
 `Subject ...`, `diff --git`, `index ...` lines all count). That prefix is NOT the target
-file's line number — it's just where the line sits in the patch text. Never cite a
+file's line number. It's just where the line sits in the patch text. Never cite a
 `Location` using those prefixes. The only valid inputs to a line-number calculation are:
 1. The hunk header's own starting line (`@@ -a,b +c,d @@` → the target line is `c` for
    the new file, `a` for a deleted line).
-2. A manual count of hunk lines from that starting point — count every ` ` (context) and
+2. A manual count of hunk lines from that starting point: count every ` ` (context) and
    `+` (added) line as one line of the new file; skip `-` (removed) lines entirely; skip
    the hunk header line itself.
 For a deletion-only finding, count against the *old* file using `a` and the `-`/` ` lines
 instead. If a hunk spans more than ~10 lines, count out loud (list each new-file line
-number next to its content) rather than eyeballing it — this is the step that produced
+number next to its content) rather than eyeballing it. This is the step that produced
 wrong line numbers before.
 
 ---
@@ -71,7 +71,7 @@ wrong line numbers before.
 
 Identify which domain(s) the diff touches, then read the matching reference  
 file(s) below before reviewing. A diff can span more than one domain (e.g. a  
-Helm chart deploying a Spark job) — read all that apply.
+Helm chart deploying a Spark job). Read all that apply.
 
 | Diff touches                                                                                                | Reference file                               |
 | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
@@ -91,7 +91,7 @@ Read `references/fan-out.md` and follow it.
 ## Review Checklist
 
 Work through all three areas for every review. Do not skip a category because  
-the diff looks small — subtle issues often hide in small changes.
+the diff looks small. Subtle issues often hide in small changes.
 
 ### 🔴 Pain Points (Obvious Issues)
 
@@ -101,7 +101,7 @@ the diff looks small — subtle issues often hide in small changes.
 - Missing, misleading, or excessively noisy logging
 - Tests that are absent, trivial, or structured in a way that can't catch regressions
 - Breaking changes to contracts (schema, API, file format, column names) with no migration plan
-- Functions or tasks doing too much — no clear single responsibility (SRP)
+- Functions or tasks doing too much: no clear single responsibility (SRP)
 - **Speculative generality** *(🟢 Minor)*: config knobs, flags, or abstraction layers built for a hypothetical future need with no current caller (YAGNI)
 - **Needless complexity** *(🟢 Minor; 🟡 Major if it obscures a correctness issue)*: extra layers, indirection, or cleverness for a problem a simpler approach would solve (KISS)
 - **Duplicated logic** *(🟢 Minor; 🟡 Major if copies have already drifted)*: copy-pasted blocks that should be one shared implementation (DRY)
@@ -113,17 +113,17 @@ the diff looks small — subtle issues often hide in small changes.
 - PII written to logs, error messages, or unencrypted/unmasked storage
 - Overly permissive IAM roles, service accounts, or database grants (Principle of Least Privilege)
 - Unvalidated or unsanitized inputs passed into downstream queries or systems
-- Insecure connections — plain HTTP, skipped TLS verification, unencrypted transport
+- Insecure connections: plain HTTP, skipped TLS verification, unencrypted transport
 - Data leakage risk across tenant boundaries or between environments (prod/staging bleed)
 
 ### 🏗️ Architectural Issues
 
 - Component tightly coupled to a specific external system, schema/API version, or tool with no abstraction layer (Dependency Inversion)
-- Missing idempotency — re-running the operation produces duplicates or inconsistent results (Idempotent Receiver)
+- Missing idempotency: re-running the operation produces duplicates or inconsistent results (Idempotent Receiver)
 - Unbounded queries, scans, or loops that will silently degrade or fail at scale
 - Blocking synchronous operations where async or parallel processing is warranted
-- Schema/contract drift not handled — code assumes a fixed structure with no validation or contract test
-- Observability gaps — no metrics, logs, or alerting hooks for a component expected to run unattended
+- Schema/contract drift not handled: code assumes a fixed structure with no validation or contract test
+- Observability gaps: no metrics, logs, or alerting hooks for a component expected to run unattended
 
 ---
 
@@ -132,17 +132,17 @@ the diff looks small — subtle issues often hide in small changes.
 Whoever reads this is triaging fast, not studying prose. Every Issue, Summary,  
 and Verdict line follows these rules:
 
-- Lead with what breaks or what to do — never scene-setting, never "Let's  
+- Lead with what breaks or what to do, never scene-setting, never "Let's  
   look at...", never a recap of the diff.
 - One idea per sentence. Max 20 words for an Issue cell, 25 for Summary/Verdict  
   prose.
 - Active voice, common concrete words. Cut hedges that add no information  
   ("might", "could possibly", "seems to").
-- No idioms ("circle back", "on the same page") — state the literal action.
+- No idioms ("circle back", "on the same page"). State the literal action.
 - No preamble ("Great PR!") and no closing pleasantries ("let me know if...",  
   "hope this helps").
 - Prefer a table over a bulleted list wherever the items are comparable in  
-  shape — it scans faster than prose. Cap any list/table at 5 rows; beyond  
+  shape. It scans faster than prose. Cap any list/table at 5 rows; beyond  
   that, keep the 5 most significant and drop the rest.
 
 ---
@@ -150,7 +150,7 @@ and Verdict line follows these rules:
 ## Output Format
 
 Produce the review in this exact structure. Do not omit any section, even if  
-it has no findings — use "No issues found." in that case.
+it has no findings. Use "No issues found." in that case.
 
 ```markdown
 ### Summary
@@ -162,9 +162,9 @@ it has no findings — use "No issues found." in that case.
 | 1 | file.py:42 | [One sentence: what breaks and why it matters.] | 🔴 Blocker |
 
 Severity scale:
-- 🔴 Blocker  — Must fix before merge. Risk of data loss, corruption, or production failure.
-- 🟡 Major    — Should fix before merge. Significant tech debt, reliability, or correctness risk.
-- 🟢 Minor    — Fix in a follow-up. Style, readability, or low-impact improvement.
+- 🔴 Blocker: Must fix before merge. Risk of data loss, corruption, or production failure.
+- 🟡 Major: Should fix before merge. Significant tech debt, reliability, or correctness risk.
+- 🟢 Minor: Fix in a follow-up. Style, readability, or low-impact improvement.
 
 ### 🔒 Security Issues
 | # | Location | Issue | Severity |
@@ -177,7 +177,7 @@ Severity scale:
 ### ✅ What's Done Well
 | # | Pattern |
 |---|---------|
-| 1 | [Name the pattern or decision — no elaboration. Max 5 rows.] |
+| 1 | [Name the pattern or decision. No elaboration. Max 5 rows.] |
 
 ### Verdict
 **[APPROVE / REQUEST CHANGES / NEEDS DISCUSSION]**
@@ -188,13 +188,13 @@ name the open question that must be resolved first.]
 
 During fan-out reconciliation, suffix `Issue` with ` (unverified)` for a  
 finding you passed through without independently confirming it against the  
-diff text — leave every other row unsuffixed.
+diff text. Leave every other row unsuffixed.
 
 ---
 
 ## Severity Guidance
 
-Use this to calibrate — don't over-block on style, don't under-block on correctness.
+Use this to calibrate: don't over-block on style, don't under-block on correctness.
 
 | Condition                                                            | Severity   |
 | -------------------------------------------------------------------- | ---------- |

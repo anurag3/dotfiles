@@ -14,7 +14,7 @@ pipeline config, or cloud provisioning.
 ## Architectural Issues
 
 - **Blast radius** *(🔴 Blocker if prod-wide)*: change to a shared module, shared state file, or cluster-wide policy with no scoping to test the impact before it hits every consumer
-- **Stateful resource protection** *(🔴 Blocker)*: `prevent_destroy` / deletion protection missing on databases, persistent volumes, or buckets holding data that can't be regenerated — a `terraform destroy`/`apply` typo becomes unrecoverable
+- **Stateful resource protection** *(🔴 Blocker)*: `prevent_destroy` / deletion protection missing on databases, persistent volumes, or buckets holding data that can't be regenerated: a `terraform destroy`/`apply` typo becomes unrecoverable
 - **IAM/permission scope** *(🟡 Major)*: wildcard actions/resources (`*:*`, `Resource: "*"`) granted where a scoped policy would do, service account or role reused across environments instead of least-privilege per-env
 - **Availability during change** *(🟡 Major)*: rolling update strategy or `PodDisruptionBudget` missing on a service that can't tolerate simultaneous replica loss, no health-check gate between deploy stages
 - **Config drift** *(🟡 Major)*: values hardcoded per-environment in the chart/module instead of templated via `values.yaml`/tfvars, making environments silently diverge over time
