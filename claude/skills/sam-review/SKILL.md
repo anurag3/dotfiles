@@ -161,6 +161,14 @@ it has no findings. Use "No issues found." in that case.
 |---|----------|-------|----------|
 | 1 | file.py:42 | [One sentence: what breaks and why it matters.] | 🔴 Blocker |
 
+**#1 · `file.py:40-42`**
+
+blocker: [What breaks and why. The ask.]
+
+```suggestion
+[Replacement lines, indented exactly as in the file.]
+```
+
 Severity scale:
 - 🔴 Blocker: Must fix before merge. Risk of data loss, corruption, or production failure.
 - 🟡 Major: Should fix before merge. Significant tech debt, reliability, or correctness risk.
@@ -184,42 +192,46 @@ Severity scale:
 
 [1–2 sentences. If REQUEST CHANGES, name the specific blockers. If NEEDS DISCUSSION,
 name the open question that must be resolved first.]
-
-### 💬 PR Comments
-**Pain Points #1 · `file.py:40-42`**
-
-blocker: [What breaks and why. The ask.]
-
-```suggestion
-[Replacement lines, indented exactly as in the file.]
-```
 ````
+
+The Security Issues and Architectural Issues tables use the same pattern:  
+the table, then one comment block for each row. A table with "No issues  
+found." has no comment blocks.
 
 During fan-out reconciliation, suffix `Issue` with ` (unverified)` for a  
 finding you passed through without independently confirming it against the  
-diff text. Leave every other row unsuffixed.
-
-If there are no findings, write "No comments." in the 💬 PR Comments section.
+diff text. Put the suffix on the finding row's `Issue` cell. The comment for  
+that finding uses the `question:` label. Leave every other row unsuffixed.
 
 ---
 
 ## PR Comments
 
-Write one comment for each finding row, in table order: Pain Points, then  
-Security Issues, then Architectural Issues. The user pastes each comment on  
-the PR without changes.
+Under each finding table, write one comment block for each row, in row  
+order. The user pastes each comment on the PR without changes. Do not put a  
+comment in a table cell.
 
-After the finding comments, you can write praise comments. Write a praise  
-comment only for a ✅ What's Done Well row that is unusually good. Examples are  
-a pattern that the team can use again and a good decision that is not obvious.  
-Most reviews need zero or one praise comment. Do not write a praise comment  
-for standard good practice. Use ``**What's Done Well #<n> · `<Location>`**`` as  
-the heading. Set the Location to the lines in the diff that show the pattern.
+Write each comment block in this order:
 
-- Heading: ``**<Table> #<n> · `<Location>`**``.
-- Comment line: `<label>: <what breaks and why>. <the ask>.` Write one line  
-  of 30 words or fewer. Write the ask as a request ("Can we ...?") or as a  
-  direct instruction.
+1. Heading: ``**#<n> · `<Location>`**``. `<n>` is the row number in that  
+   table. `<Location>` is the exact line range that the comment attaches to  
+   and that a suggestion replaces.
+2. A blank line.
+3. The comment line: `<label>: <what breaks and why>. <the ask>.` Write it as  
+   plain text on one line, not in a table cell or a wrapped paragraph. Use 30  
+   words or fewer. Write the ask as a request ("Can we ...?") or as a direct  
+   instruction.
+4. If the `suggestion` block rules permit it, a `suggestion` block.
+
+You can also write praise comments. Write a praise comment only for a ✅  
+What's Done Well row that is unusually good. Examples are a pattern that the  
+team can use again and a good decision that is not obvious. Most reviews need  
+zero or one praise comment. Do not write a praise comment for standard good  
+practice. Put each praise comment block directly under the ✅ What's Done  
+Well table. Use ``**#<n> · `<Location>`**`` as the heading, then a blank line,  
+then the praise line. Set the Location to the lines in the diff that show the  
+pattern.
+
 - Praise comment line: `<label>: <what is good and why>.` Write one line of 30  
   words or fewer. Do not write an ask.
 
@@ -239,9 +251,9 @@ Use these rules for the `suggestion` block:
 
 1. Add a `suggestion` block only when the fix replaces lines that the diff  
    shows in the new file. Otherwise, do not add the block.
-2. Set the heading Location to the exact line range that the block replaces  
-   (`file.py:270-276`). GitHub replaces all lines in that range with the  
-   block contents.
+2. Set the comment block heading Location to the exact line range that the  
+   block replaces (`file.py:270-276`). GitHub replaces all lines in that range  
+   with the block contents.
 3. Copy the indentation of each line exactly from the diff. If the  
    indentation is wrong, the code breaks when the author commits the  
    suggestion.
