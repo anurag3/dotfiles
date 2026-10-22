@@ -264,6 +264,41 @@ Use these rules for the `suggestion` block:
 
 ---
 
+## Post the Review
+
+Post a review only when the user asks you to post it. Post it as a pending  
+review. A pending review is a draft on GitHub that only the user can see. The  
+user edits the draft on GitHub and submits it. Do not submit the review  
+yourself.
+
+1. Write the review body as one sentence of 15 words or fewer. State the  
+   verdict and the number of blockers. Do not repeat the Summary, the tables,  
+   or the inline comments. Do not add headers, lists, or sign-offs. Examples:
+   - `Request changes: 2 blockers inline.`
+   - `Approve. One nit inline.`
+   - `One question inline before I approve.`
+2. Get the PR head SHA with `gh pr view <PR URL> --json headRefOid`.
+3. Write `/tmp/pr<number>-review.json` with `commit_id` (the head SHA),  
+   `body`, and `comments`. Do not set `event`. If `event` is not set, GitHub  
+   keeps the review pending.
+4. In `comments`, give each comment `path`, `line`, `side: "RIGHT"`, and  
+   `body`. For a range, also set `start_line`. The comment `body` is the  
+   comment line and its `suggestion` block.
+5. Post the body and all inline comments as one pending review:
+
+   ```bash
+   gh api repos/<owner>/<repo>/pulls/<number>/reviews --input /tmp/pr<number>-review.json
+   ```
+
+6. If GitHub returns 422 because a pending review exists, stop. Tell the user  
+   to submit or delete that review on GitHub first.
+7. Give the user the PR URL, the review body, and the number of inline  
+   comments. Tell the user to edit the draft on the "Files changed" tab. Then  
+   tell the user to click "Submit review" and select the event that matches  
+   the Verdict.
+
+---
+
 ## Severity Guidance
 
 Use this to calibrate: don't over-block on style, don't under-block on correctness.
