@@ -81,7 +81,7 @@ Plan format (add to every plan that `superpowers:writing-plans` or plan mode wri
 
 To execute or resume a plan, including after compaction, invoke the `executing-plans-in-waves` skill first.
 
-Exception: for a single task with no plan, dispatch one `implementer` directly. Only deviate if the user explicitly asks for inline execution or another approach.
+Exception: for a single task with no plan, dispatch one `implementer` directly. Set its `model` from the "Model selection" table in `~/.claude/skills/executing-plans-in-waves/SKILL.md`. If its tests fail or its review has findings, follow "Model escalation" in the same file. Only deviate if the user explicitly asks for inline execution or another approach.
 
 `plan-file-location-guard.py` replaces the superpowers subagent-driven-development header in plan files.
 
