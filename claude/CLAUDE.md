@@ -147,3 +147,15 @@ Invoke the `sampling-databricks-tables` skill first. Prefer Genie One (`databric
 ## 14. Standing Reply Shaping: ad-concise
 
 The `ad-concise` output style (set in settings.json) shapes conversational replies.
+
+## 15. Local Repo Notes in `.docs/`
+
+**When you learn a specific detail about a pipeline, service, or implementation in a repo, write it to `<repo>/.docs/`. `~/.gitignore_global` ignores `.docs/`, so these notes stay local.**
+
+- Before you work in a repo, read its `.docs/` folder if it exists.
+- Write the details that the code and the repo's own docs do not show: special cases, unusual data behavior, failure modes, dependencies between steps, and the reasons for decisions.
+- Use one Markdown file for each topic, for example `.docs/dedup-logic.md`. If a file for the topic exists, update it.
+- If `.docs/` does not exist, create it when you write the first note.
+- Do not write these notes to `docs/`. Twelve repos track `docs/` for team documentation.
+- Do not put `.docs/` paths or content in a commit message or PR body.
+- Rule 8 applies to these files.
