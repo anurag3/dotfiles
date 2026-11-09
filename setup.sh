@@ -31,7 +31,7 @@ declare -A SECTION_DESC=(
     [spotlight]="Spotlight search categories"
     [iterm2]="iTerm2 preferences"
     [ghostty]="Ghostty config"
-    [herdr]="herdr config"
+    [herdr]="herdr + herdr-app config"
     [cursor]="Cursor settings + extensions"
     [editor]="Default editor (Cursor on work, VSCode on personal)"
     [bun]="Bun install"
@@ -762,9 +762,12 @@ ln -sf "$DOTFILES_DIR/ghostty/config.ghostty" "$GHOSTTY_DIR/config.ghostty"
 # herdr Config                                                                #
 ###############################################################################
 section_herdr() {
-echo "==> Symlinking herdr config..."
+echo "==> Symlinking herdr and herdr-app config..."
 mkdir -p "$HOME/.config/herdr"
 ln -sf "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+mkdir -p "$HOME/.config/herdr-app"
+ln -sf "$DOTFILES_DIR/herdr-app/keys.json" "$HOME/.config/herdr-app/keys.json"
+ln -sf "$DOTFILES_DIR/herdr-app/settings.json" "$HOME/.config/herdr-app/settings.json"
 }
 
 ###############################################################################

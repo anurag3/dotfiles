@@ -41,6 +41,7 @@ Sections (interactive checklist in Setup mode, or pass section names as args):
 - Copies iTerm2 preferences
 - Installs + copies Ghostty config
 - Copies herdr config
+- Symlinks herdr-app config (`~/.config/herdr-app/`)
 - Copies Cursor settings + installs extensions
 - Configures the Claude Code status line
 - Sets Cursor as the default editor
@@ -68,6 +69,7 @@ dotfiles/
 ├── nvim/             # Neovim (LazyVim) config
 ├── ghostty/          # Ghostty terminal config
 ├── herdr/            # herdr config (workspace/pane keybindings, etc.)
+├── herdr-app/        # herdr-app keybindings (keys.json) and settings (settings.json)
 ├── iterm2/           # iTerm2 prefs (auto-synced by iTerm2 on quit)
 ├── rectangle/        # Rectangle window manager prefs
 ├── vorssaint/        # Vorssaint prefs
