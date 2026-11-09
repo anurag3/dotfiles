@@ -69,7 +69,7 @@ dotfiles/
 ├── nvim/             # Neovim (LazyVim) config
 ├── ghostty/          # Ghostty terminal config
 ├── herdr/            # herdr config (workspace/pane keybindings, etc.)
-├── herdr-app/        # herdr-app keybindings (keys.json) and settings (settings.json)
+├── herdr-app/        # herdr-app keybindings (keys.json), settings (settings.json), layout (my-layout.json)
 ├── iterm2/           # iTerm2 prefs (auto-synced by iTerm2 on quit)
 ├── rectangle/        # Rectangle window manager prefs
 ├── vorssaint/        # Vorssaint prefs

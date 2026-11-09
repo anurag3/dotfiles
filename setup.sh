@@ -768,6 +768,8 @@ ln -sf "$DOTFILES_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 mkdir -p "$HOME/.config/herdr-app"
 ln -sf "$DOTFILES_DIR/herdr-app/keys.json" "$HOME/.config/herdr-app/keys.json"
 ln -sf "$DOTFILES_DIR/herdr-app/settings.json" "$HOME/.config/herdr-app/settings.json"
+mkdir -p "$HOME/.config/herdr-app/layouts"
+ln -sf "$DOTFILES_DIR/herdr-app/my-layout.json" "$HOME/.config/herdr-app/layouts/my-layout.json"
 }
 
 ###############################################################################
