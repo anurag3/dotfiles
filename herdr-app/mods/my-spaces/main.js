@@ -5,7 +5,7 @@
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+import { agents, spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -29,6 +29,8 @@ const rowHeight = ({ tree }) => (tree ? 28 : 30);
 const RAIL_CELL = 32;
 const railCell = (el) => h_flex().flex_none().justify_center().child(el);
 const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
+const clean = (s) => (s ?? "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
+const RANK = { blocked: 4, done: 3, working: 2, idle: 1 };
 const base = (path) => path.replace(/\/+$/, "").split("/").pop();
 // Changes made outside Herdr (an editor's save, a commit in another app): looked
 // for this often, in repos the list shows, while the window is in front.
@@ -383,11 +385,14 @@ export default class Spaces extends View {
     const colors = shared("space.colors") ?? {};
     const color = colors[w.id] ?? "ansi6";
     const fill = color.startsWith("#") ? color : (MARK[color] ?? t[color]);
+    const a = this.lead?.get(w.id);
+    const desc = a ? clean(a.title) || a.program?.name : "";
     return v_flex()
       .relative()
       .id(`space-${w.id}`)
       .px(8)
-      .h(rowHeight({ tree }))
+      .min_h(rowHeight({ tree }))
+      .when(Boolean(desc), (el) => el.py(5))
       .flex_none()
       .justify_center()
       .rounded(8)
@@ -431,7 +436,8 @@ export default class Spaces extends View {
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().min_w(0).whitespace_normal().text_color(t.foreground).child(w.name))
           .child(g ? this.gitTail(g, tree, w.name, t) : div().flex_1()),
-      );
+      )
+      .when(Boolean(desc), (el) => el.child(div().pl(tree ? 44 : 27).min_w(0).whitespace_normal().text_size(11.5).text_color(t.dim).child(desc)));
   }
 
   compact({ w, i }, t) {
@@ -465,6 +471,9 @@ export default class Spaces extends View {
       changed = true;
     }
     if (changed) setShared("space.colors", kept);
+    // Each space's most urgent agent: its title is the row's second line.
+    this.lead = new Map();
+    for (const a of agents()) if ((RANK[a.status] ?? 0) > (RANK[this.lead.get(a.space)?.status] ?? 0)) this.lead.set(a.space, a);
     return v_flex().size_full().min_h(0).bg(t.chrome).text_size(13)
       .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(11.5).text_color(t.dim)
         .when(collapsed, el => el.pl(0).pr(0).justify_center())
