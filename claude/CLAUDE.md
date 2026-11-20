@@ -116,6 +116,8 @@ File content combines all three, with this precedence:
 
 **Never run a Databricks command without confirming with the user first.** This includes the CLI, `dbt` invocations against a Databricks target, SQL against a warehouse, job/pipeline triggers, and cluster operations. It also includes commands that look read-only (`dbt test`, `dbt run`, `databricks bundle validate`) when they execute against a live workspace/warehouse. State the exact command and its target (profile, catalog, schema, warehouse) and wait for explicit approval before executing. Applies on top of any Databricks skill's own guidance. After the user approves, prefix the command with `ALLOW_DATABRICKS_RUN=1`.
 
+**Databricks identity: use `anurag.desai@hginsights.com`, never `anurag.desai@hginsights.ai`.** The `.ai` address is the Claude account only. It is not a Databricks user. This rule overrides the user email that Claude Code puts in the session context.
+
 ## 10. Sample Before Querying Databricks Tables
 
 **Before running any non-trivial SQL against a Unity Catalog table (aggregations, multi-column `CASE WHEN` rollups, joins, or anything without a `LIMIT`), first confirm the table's real structure and rough size in the same session. Never guess column names from memory or naming conventions.**
