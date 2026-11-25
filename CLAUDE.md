@@ -28,6 +28,12 @@ bash setup.sh git zsh      # or list section names to run only those
 python3 -m unittest discover -s claude/hooks/tests -v
 ```
 
+- To run the `repo-docs` skill script tests, run this command from the repo root. The tests need pytest:
+
+```bash
+uv run --with pytest python3 -m pytest claude/skills/repo-docs/scripts/tests -q
+```
+
 ## iTerm2 Color Scheme
 
 Monokai Soda — must be manually imported from the iTerm2-Color-Schemes repo.
