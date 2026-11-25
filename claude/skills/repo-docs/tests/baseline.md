@@ -17,7 +17,7 @@ Content quality was high in all four runs: `path:line` evidence, real latent bug
 
 1. **Each run invents its own freshness scheme.** Three runs, three schemes:
    - A: header lines `verified-at:` / `verified-date:` / `covers:` in each note, plus `.docs/check-freshness.sh`.
-   - B: reads and rewrites a prose line in README ("Updated 2026-11-23 to `master` at `aac3479f`"). Works only because the README had a SHA.
+   - B: reads and rewrites a prose line in README ("Updated 2026-11-23 to `master` at `a1b2c3d4`"). Works only because the README had a SHA.
    - D: YAML front matter (`baseline_commit`, `depends_on`, `verification`), plus `.docs/tools/check-stale.sh`.
 2. **Each run invents its own layout and names.** `one-pager.md` vs other names. `latent-bugs.md` (A, D) vs `known-issues.md` (existing). D added `reference/ data/ ops/ plans/` subfolders. A has a 167-line DAG catalog.
 3. **Marker words differ in every run.** A: "Read" / "Verified". C: "Probable (not confirmed)". D: "inferred" lowercase.
@@ -26,7 +26,7 @@ Content quality was high in all four runs: `path:line` evidence, real latent bug
 6. **Destructive changes without asking.** D deleted 2 files and moved 15 files with no confirmation.
 7. **Person names kept.** D renamed `questions-for-<name>.md` to `plans/open-questions-<name>.md`.
 8. **Update did not check citations or time-bound text.** B edited one note and the README line. It did not look for broken `path:line` or dated status lines.
-9. **Capture went to a catch-all file.** C put DS 67 facts into `domain-notes.md`.
+9. **Capture went to a catch-all file.** C put the feature's facts into `domain-notes.md`.
 10. **1-pager size.** A 113 lines with 3 diagrams. D 120 lines with 4 flowcharts and a gantt chart.
 
 ### Natural grain to keep
@@ -37,7 +37,7 @@ Content quality was high in all four runs: `path:line` evidence, real latent bug
 
 ## With skill
 
-Same prompts on fresh clones, plus "if a step needs approval, write the question, assume yes". The scala clone was stamped at `5a5ef0f0` with `covers` so `update` had a real base. All four runs invoked `repo-docs` and `simplified-technical-english` with no hint.
+Same prompts on fresh clones, plus "if a step needs approval, write the question, assume yes". The scala clone was stamped at `e5f6a7b8` with `covers` so `update` had a real base. All four runs invoked `repo-docs` and `simplified-technical-english` with no hint.
 
 | ID | Result | Evidence |
 |---|---|---|

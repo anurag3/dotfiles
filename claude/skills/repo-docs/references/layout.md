@@ -118,7 +118,7 @@ Omit a section that has no content. A "What happens / Evidence" table is the bes
 
 ## Confirmed bugs
 
-- Confirmed: `loader/merge.py:88` The INSERT lists `foreign_source, foreign_id` in the opposite order of the table columns. Effect: each row stores the source in the ID column. Evidence: column order in `sql/create_events.sql:5-9`.
+- Confirmed: `loader/merge.py:88` The INSERT lists `external_source, external_id` in the opposite order of the table columns. Effect: each row stores the source in the ID column. Evidence: column order in `sql/create_events.sql:5-9`.
 
 ## Inferred bugs
 
@@ -156,11 +156,11 @@ One line for each gotcha. Group by area. Use the same area names as the topic no
 Each file in `investigations/` starts with this header. The manifest marks it `"frozen": true`, so `update` does not check it again.
 
 ```markdown
-# DS-59 duplicate domains
+# PROJ-123 duplicate customers
 
 - Date: 2026-11-04
-- Ticket: DS-59
-- Data source: `prod.silver.company_domains`, snapshot of 2026-11-04
+- Ticket: PROJ-123
+- Data source: `prod.silver.customers`, snapshot of 2026-11-04
 ```
 
 ## manifest.json
@@ -176,7 +176,7 @@ Each file in `investigations/` starts with this header. The manifest marks it `"
     "README.md": {"covers": []},
     "code-flow.md": {"covers": ["src/main.py", "databricks.yml"], "sha": "a1abbff1...", "checked": "2026-11-23"},
     "loader.md": {"covers": ["loader", "sql/*.sql", "tests/**/test_loader*.py"], "sha": "a1abbff1...", "checked": "2026-11-23"},
-    "investigations/ds59-duplicate-domains.md": {"covers": [], "frozen": true}
+    "investigations/proj123-duplicate-customers.md": {"covers": [], "frozen": true}
   }
 }
 ```

@@ -123,7 +123,7 @@ Update records committed changes only. `stamp` records `HEAD`, so it does not in
    3. Add new facts from the diff, with `path:line` and a marker.
 3. For each bug in `known-issues.md` that a commit fixed, move it to "Resolved". Add the fixing SHA from `git log --oneline <old-sha>..HEAD -- <path>`.
 4. For each path under "Uncovered changes", add the path to the `covers` of the correct note. If no note fits, propose a new topic note to the user. Add each new note to `manifest.json` and to the README index.
-5. Fix each line under "Broken citations", including lines from before this run. Find the new path with `git log --follow --name-status -- <old-path>`. For a path in another repo, add the repo name as a prefix (`ops-delivery/terraform/role.tf:153`), so the script skips it. Replace an abbreviated path (`MS/Main.scala:62`) with the full repo-relative path.
+5. Fix each line under "Broken citations", including lines from before this run. Find the new path with `git log --follow --name-status -- <old-path>`. For a path in another repo, add the repo name as a prefix (`infra-repo/terraform/role.tf:153`), so the script skips it. Replace an abbreviated path (`core/Main.scala:62`) with the full repo-relative path.
 6. For each line under "Stale time-bound statements", check the fact again. Write the new state with a new `as of` date, or remove the line. Correct each line under "Bad dates".
 7. If a changed area is in a `ONE-PAGER.md` diagram, update the diagram.
 8. Update the `CLAUDE.local.md` block.

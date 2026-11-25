@@ -8,9 +8,9 @@ Look for these latent-bug patterns in data pipelines and services. For each hit,
 
 | Pattern | What to check | Example |
 |---|---|---|
-| Swapped positional arguments or columns | An `INSERT` without a column list, or a call with positional arguments of the same type. Compare the order with the table DDL or the function signature | `insert into t select foreign_source, foreign_id` against DDL `(foreign_id, foreign_source)` |
+| Swapped positional arguments or columns | An `INSERT` without a column list, or a call with positional arguments of the same type. Compare the order with the table DDL or the function signature | `insert into t select external_source, external_id` against DDL `(external_id, external_source)` |
 | Config key that has no effect | A config key with a typo or a wrong prefix. The system ignores it with no error | `spark.shuffle.partitions` is not a key. The correct key is `spark.sql.shuffle.partitions` |
-| Silent mock or fallback path | A missing credential, connection, or data source returns fake, empty, or default data, not an error | A missing search connection returns `_mock_counts`. The UI shows realistic numbers |
+| Silent mock or fallback path | A missing credential, connection, or data source returns fake, empty, or default data, not an error | A missing API key returns `sample_results()`. The UI shows realistic numbers |
 | Inner join that drops rows | An `inner join` to a lookup or seed with no test that the row count stays the same | Orders in a new currency drop from `fct_orders` |
 | Case-sensitive exact join to a seed | A join on a string key with no `lower()` or `trim()`, to a hand-edited CSV | `'Acme Inc'` does not match `'ACME Inc'` |
 | `LIMIT` with no order used to sample | Sampled tables joined to each other, or tests that depend on sampled rows | Two sampled tables share almost no keys |
@@ -23,7 +23,7 @@ Look for these latent-bug patterns in data pipelines and services. For each hit,
 | Missing retries or alerts | A job, task, or external call with no retry, no timeout, and no failure alert | A nightly job fails and nobody gets a message |
 | Wrong error handling | A broad `except` that logs and continues, or a return code that the caller ignores | A failed load writes 0 rows and the job passes |
 | Missing import or name | A name that the file uses but does not define or import, often in notebooks | `timezone.utc` with no `from datetime import timezone` |
-| Different constants for one value | The same ID or code with different values in different steps | `source_id = 16` in one step and `= 13` in the next step |
+| Different constants for one value | The same ID or code with different values in different steps | `region_id = 4` in one step and `= 7` in the next step |
 
 Also compare the code with `README.md`, `AGENTS.md`, `CLAUDE.md`, and code comments. Record each difference as Doc drift.
 

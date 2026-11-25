@@ -31,7 +31,7 @@ Start at `.docs/README.md`. Read only the note for your task area.
 
 ### Top confirmed bugs
 
-- `loader/merge.py:88`: the INSERT swaps `foreign_id` and `foreign_source`.
+- `loader/merge.py:88`: the INSERT swaps `external_id` and `external_source`.
 - Full list: [.docs/known-issues.md](.docs/known-issues.md).
 
 ### Where to read
